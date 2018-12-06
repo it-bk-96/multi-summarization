@@ -1,0 +1,4 @@
+data folder structure
+|summaries
+|--MMR_results
+|--LexRank_results
