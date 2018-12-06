@@ -355,7 +355,7 @@ DIR_PATH = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file_
 if __name__ == '__main__':
 
     # set the main Document folder path where the subfolders are present
-    main_data_path = DIR_PATH + "/data"
+    main_data_path = DIR_PATH + "/data/automatic"
     print main_data_path
 
     i = 0
@@ -393,6 +393,9 @@ if __name__ == '__main__':
             for sent in summary:
                 final_summary = final_summary + sent.getOriginalWords() + "\n"
             final_summary = final_summary[:-1]
-            results_folder = DIR_PATH + "/summaries/MMR_results"
+            results_folder = DIR_PATH + "/summaries/MMR_results" + '/' + folder
+            if not os.path.exists(results_folder):
+                os.makedirs(results_folder)
+
             with open(os.path.join(results_folder, (tmp + str(folder) + ".1.txt")), "w") as fileOut:
                 fileOut.write(final_summary)
