@@ -300,12 +300,12 @@ DIR_PATH = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file_
 if __name__ == '__main__':
 
     lexRank = LexRank()
-    doc_folders = os.walk(DIR_PATH + '/data').next()[1]
+    doc_folders = os.walk(DIR_PATH + '/data/automatic').next()[1]
     print doc_folders
     total_summary = []
     summary_length = 20
     for i in range(len(doc_folders)):
-        path = os.path.join(DIR_PATH + '/data', '') + doc_folders[i]
+        path = os.path.join(DIR_PATH + '/data/automatic', '') + doc_folders[i]
         doc_summary = []
         summary = []
         print path
@@ -322,13 +322,16 @@ if __name__ == '__main__':
         # print total_summary
         # break
 
-    os.chdir(DIR_PATH + "/summaries/" + "LexRank_results")
     text_len = 100
     tmp = 'summary_'
     for i in range(len(doc_folders)):
-        myfile = tmp + doc_folders[i] + ".1.txt"
-        f = open(myfile, 'w')
+        result_folder = DIR_PATH + "/summaries/" + "LexRank_results/" + doc_folders[i]
+        if not os.path.exists(result_folder):
+            os.makedirs(result_folder)
 
+        myfile = result_folder + '/' + tmp + doc_folders[i] + ".1.txt"
+        f = open(myfile, 'w')
+        print 1
         tmp_len = 0
         for j in range(summary_length):
             # print ('------------------------------------')
