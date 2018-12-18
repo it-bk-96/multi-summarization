@@ -155,19 +155,19 @@ class Preprocessing(object):
 			# text = re.sub("APW19981212.0848","",text)
 			# text = re.sub("APW19981129.0668","",text)
 			# text = re.sub("NEWSWIRE","",text)
-			text_1 = re.search(r"<TEXT>.*</TEXT>", text, re.DOTALL)
-			text_1 = re.sub("<TEXT>\n", "", text_1.group(0))
-			text_1 = re.sub("\n</TEXT>", "", text_1)
-
-			# replace all types of quotations by normal quotes
-			text_1 = re.sub("\n", " ", text_1)
-			text_1 = re.sub(" +", " ", text_1)
+			# text_1 = re.search(r"<TEXT>.*</TEXT>", text, re.DOTALL)
+			# text_1 = re.sub("<TEXT>\n", "", text_1.group(0))
+			# text_1 = re.sub("\n</TEXT>", "", text_1)
+			#
+			# # replace all types of quotations by normal quotes
+			# text_1 = re.sub("\n", " ", text_1)
+			# text_1 = re.sub(" +", " ", text_1)
 			# text_1 = re.sub("\'\'","\"",text_1)
 			# text_1 = re.sub("\`\`","\"",text_1)
 
 			sent_tokenizer = nltk.data.load('tokenizers/punkt/english.pickle')
 
-			lines = sent_tokenizer.tokenize(text_1.strip())
+			lines = sent_tokenizer.tokenize(text.strip())
 			text_1 = lines
 
 			sentences = []
@@ -373,10 +373,10 @@ class DocumentSim(object):
 if __name__ == '__main__':
 
 	lexRank = LexRank()
-	doc_folders = os.walk("Documents").next()[1]
+	doc_folders = os.walk("Data_DUC_2007/25_Documents").next()[1]
 	total_summary = []
 	for i in range(len(doc_folders)):
-		path = os.path.join("Documents", '') + doc_folders[i]
+		path = os.path.join("Data_DUC_2007/25_Documents", '') + doc_folders[i]
 		doc_summary = []
 		summary_length = 6
 		summary = []
@@ -389,7 +389,7 @@ if __name__ == '__main__':
 			text_append = text_append + " "
 			doc_summary.append(text_append)
 		total_summary.append(doc_summary)
-	os.chdir("Lexrank_results")
+	os.chdir("Data_DUC_2007/25_Documents_LexRank_results")
 	for i in range(len(doc_folders)):
 		myfile = doc_folders[i] + ".LexRank"
 		f = open(myfile, 'w')
