@@ -3,7 +3,7 @@ import os
 import math
 import string
 import re
-import sentence
+from MMR import sentence
 from nltk.corpus import stopwords
 
 
@@ -30,9 +30,10 @@ def process_file(file_name):
     text_1 = re.sub(" +", " ", text_1)
 
     # segment data into a list of sentences
+    # print (text_1)
     sentence_token = nltk.data.load('tokenizers/punkt/english.pickle')
     lines = sentence_token.tokenize(text_1.strip())
-
+    # print (lines)
     # setting the stemmer
     sentences = []
     porter = nltk.PorterStemmer()
@@ -52,10 +53,18 @@ def process_file(file_name):
         # stemming words
         stemmedSent = [porter.stem(word) for word in sent]
         # print stemmedSent
+        # print (stemmedSentil)
         stemmedSent = filter(lambda x: x != '.' and x != '`' and x != ',' and x != '?' and x != "'"
                                        and x != '!' and x != '''"''' and x != "''" and x != "'s" and x != '``',
                              stemmedSent)
+        # print (element in stemmedSent)
+        # for element in stemmedSent:
+        #     print (element)
 
+        stemmedSent = [word for word in stemmedSent]
+        # print (stemmedSent)
+
+        # print("--------------+++++++++++++++++++---------------------")
         # list of sentence objects
         if stemmedSent != []:
             sentences.append(sentence.sentence(file_name, stemmedSent, originalWords))
@@ -157,9 +166,12 @@ def IDFs(sentences):
 
     # every sentence in our cluster
     for sent in sentences:
-
+        # print(sent.getPreProWords())
+        # print(1)
         # every word in a sentence
         for word in sent.getPreProWords():
+            # print(1)
+            # print(word)
 
             # not to calculate a word's IDF value more than once
             if sent.getWordFreq().get(word, 0) != 0:
@@ -191,11 +203,15 @@ def TF_IDF(sentences):
     # Method variables
     tfs = TFs(sentences)
     idfs = IDFs(sentences)
+    # print (sentences)
     retval = {}
 
     # for every word
     for word in tfs:
+        # print (word)
         # calculate every word's tf-idf score
+        # print (tfs[word])
+        # print (idfs[word])
         tf_idfs = tfs[word] * idfs[word]
 
         # add word and its tf-idf score to dictionary
@@ -243,7 +259,11 @@ def sentenceSim(sentence1, sentence2, IDF_w):
 def buildQuery(sentences, TF_IDF_w, n):
     # sort in descending order of TF-IDF values
     scores = TF_IDF_w.keys()
+    # print (scores)
+    scores = sorted(scores)
+    # print (scores)
     scores.sort(reverse=True)
+    # print (scores)
 
     i = 0
     j = 0
@@ -356,13 +376,13 @@ if __name__ == '__main__':
 
     # set the main Document folder path where the subfolders are present
     main_data_path = DIR_PATH + "/data/automatic"
-    print main_data_path
+    print (main_data_path)
 
     i = 0
     for folder in os.listdir(main_data_path):
         current_folder = main_data_path + '/' + folder
         if os.path.isdir(current_folder):
-            print folder
+            print (folder)
             files = os.listdir(current_folder)
             sentences = []
 
