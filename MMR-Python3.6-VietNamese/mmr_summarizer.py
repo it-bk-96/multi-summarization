@@ -1,6 +1,8 @@
 import os
 import math
 import sentence
+import nltk
+from pyvi import ViTokenizer
 
 # ---------------------------------------------------------------------------------
 # Description	: Function to preprocess the files in the document cluster before
@@ -10,13 +12,44 @@ import sentence
 # Parameters	: file_name, name of the file in the document cluster
 # Return 		: list of sentence object
 # ---------------------------------------------------------------------------------
+# def processFile(file_name):
+# 	# read file from provided folder path
+# 	f = open(file_name, 'r')
+# 	text_1 = f.read()
+#
+# 	# tách câu
+# 	lines = text_1.strip().split("\n")
+#
+# 	# setting the stemmer
+# 	sentences = []
+#
+# 	# modelling each sentence in file as sentence object
+# 	for line in lines:
+#
+# 		# giữ lại câu gốc
+# 		originalWords = line[:]
+#
+# 		# chuyển đối tất cả chữ hoa trong chuỗi sang kiểu chữ thường "Good Mike" => "good mike"
+# 		line = line.strip().lower()
+#
+# 		stemmedSent = list(map(str, line.split(" ")))
+# 		stemmedSent = list(filter(lambda x: x != '.' and x != '`' and x != ',' and x != '?' and x != "'"
+# 		                               and x != '!' and x != '''"''' and x != "''" and x != "'s", stemmedSent))
+#
+# 		# list of sentence objects
+# 		if stemmedSent != []:
+# 			sentences.append(sentence.sentence(file_name, stemmedSent, originalWords))
+#
+# 	return sentences
+
 def processFile(file_name):
 	# read file from provided folder path
 	f = open(file_name, 'r')
 	text_1 = f.read()
 
 	# tách câu
-	lines = text_1.strip().split("\n")
+	sentence_token = nltk.data.load('tokenizers/punkt/english.pickle')
+	lines = sentence_token.tokenize(text_1.strip())
 
 	# setting the stemmer
 	sentences = []
@@ -30,7 +63,9 @@ def processFile(file_name):
 		# chuyển đối tất cả chữ hoa trong chuỗi sang kiểu chữ thường "Good Mike" => "good mike"
 		line = line.strip().lower()
 
-		stemmedSent = list(map(str, line.split(" ")))
+		# tách từ
+		stemmedSent = ViTokenizer.tokenize(line)
+
 		stemmedSent = list(filter(lambda x: x != '.' and x != '`' and x != ',' and x != '?' and x != "'"
 		                               and x != '!' and x != '''"''' and x != "''" and x != "'s", stemmedSent))
 
@@ -269,7 +304,7 @@ def MMRScore(Si, query, Sj, lambta, IDF):
 if __name__ == '__main__':
 
 	# set the main Document folder path where the subfolders are present
-	main_folder_path = os.getcwd() + "/Data_VN_200_cluster/Documents"
+	main_folder_path = os.getcwd() + "/Data_Chưa_tách_từ/Documents"
 
 	# read in all the subfolder names present in the main folder
 	for folder in os.listdir(main_folder_path):
@@ -303,6 +338,6 @@ if __name__ == '__main__':
 		for sent in summary:
 			final_summary = final_summary + sent.getOriginalWords() + "\n"
 		final_summary = final_summary[:-1]
-		results_folder = os.getcwd() + "/Data_VN_200_cluster/MMR_results"
+		results_folder = os.getcwd() + "/Data_Chưa_tách_từ/MMR_results"
 		with open(os.path.join(results_folder, (str(folder) + ".MMR")), "w") as fileOut:
 			fileOut.write(final_summary)
