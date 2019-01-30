@@ -323,7 +323,6 @@ class DocumentSim(object):
 	def IDFs(self, sentences):
 
 		N = len(sentences)
-		idf = 0
 		idfs = {}
 		words = {}
 		w2 = []
@@ -373,15 +372,15 @@ class DocumentSim(object):
 if __name__ == '__main__':
 
 	lexRank = LexRank()
-	doc_folders = os.walk("Data_DUC_2007/25_Documents").next()[1]
+	doc_folders = os.walk("Data_DUC_2007/Documents").next()[1]
 	total_summary = []
-	for i in range(len(doc_folders)):
-		path = os.path.join("Data_DUC_2007/25_Documents", '') + doc_folders[i]
+	summary_length = 6
+
+	for folder in doc_folders:
+		path = os.path.join("Data_DUC_2007/Documents/", '') + folder
+		print("Running LexRank Summarizer for files in folder: ", folder)
 		doc_summary = []
-		summary_length = 6
-		summary = []
 		summary = lexRank.main(summary_length, path)
-		print i
 		for sentences in summary:
 			# print "\n", sentences.getOGwords(), "\n"
 			text_append = re.sub("\n", "", sentences.getOGwords())
@@ -389,7 +388,8 @@ if __name__ == '__main__':
 			text_append = text_append + " "
 			doc_summary.append(text_append)
 		total_summary.append(doc_summary)
-	os.chdir("Data_DUC_2007/25_Documents_LexRank_results")
+	os.chdir("Data_DUC_2007/LexRank_results")
+
 	for i in range(len(doc_folders)):
 		myfile = doc_folders[i] + ".LexRank"
 		f = open(myfile, 'w')
