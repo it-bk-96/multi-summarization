@@ -130,7 +130,7 @@ if __name__ == '__main__':
 	textRank = TextRank()
 	doc_folders = os.listdir("Data_Chưa_tách_từ/Documents")
 	total_summary = []
-	summary_length = 10
+	summary_length = 5
 
 	for folder in doc_folders:
 		path = os.path.join("Data_Chưa_tách_từ/Documents/", '') + folder
