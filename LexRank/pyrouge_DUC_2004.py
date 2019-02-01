@@ -16,7 +16,7 @@ if __name__ == "__main__":
     # 'model' refers to the human summaries
     rouge.model_dir = 'Data_DUC_2004/Human_Summaries'
     rouge.model_filename_pattern = 'D3#ID#.P.10.T.[A-Z].*[A-Z]*[0-9].*[0-9]'
-    rouge.system_dir = 'Data_DUC_2004/LexRank_results'
+    rouge.system_dir = 'Data_DUC_2004/LexRank_results_Standard_PageRank'
     # rouge.system_filename_pattern = 'd3(\d+)t.MMR'
     rouge.system_filename_pattern = 'd3(\d+)t.LexRank'
 

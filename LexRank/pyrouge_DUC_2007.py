@@ -12,9 +12,9 @@ if __name__ == "__main__":
     rouge = Rouge155(rouge_dir, rouge_args)
 
     rouge.model_dir = 'Data_DUC_2007/Human_Summaries'
-    rouge.model_filename_pattern = 'summary_#ID#.C.1.txt'
+    rouge.model_filename_pattern = 'summary_#ID#.B.1.txt'
     # rouge.system_dir = 'Data_DUC_2007/LexRank_results'
-    rouge.system_dir = 'Data_DUC_2007/25_Documents_LexRank_results'
+    rouge.system_dir = 'Data_DUC_2007/LexRank_results'
     rouge.system_filename_pattern = 'D07(\d+)[A-Z].LexRank'
 
     print ("-----------------MMR DUC 2007--------------------------")

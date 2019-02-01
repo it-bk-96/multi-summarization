@@ -1,9 +1,7 @@
 import os
 import math
 import numpy
-import copy
 import nltk
-from bs4 import BeautifulSoup
 import re
 
 
@@ -15,25 +13,18 @@ class LexRank(object):
 	def score(self, sentences, idfs, CM, t):
 
 		Degree = [0 for i in sentences]
-		L = [0 for i in sentences]
 		n = len(sentences)
 
 		for i in range(n):
 			for j in range(n):
 				CM[i][j] = self.sim.sim(sentences[i], sentences[j], idfs)
-
-				if CM[i][j] > t:
-					CM[i][j] = 1
-					Degree[i] += 1
-
-				else:
-					CM[i][j] = 0
+				Degree[i] += CM[i][j]
 
 		for i in range(n):
 			for j in range(n):
 				CM[i][j] = CM[i][j] / float(Degree[i])
 
-		L = self.PowerMethod(CM, n, 0.2)
+		L = self.PageRank(CM, n)
 		normalizedL = self.normalize(L)
 
 		for i in range(len(normalizedL)):
@@ -43,20 +34,17 @@ class LexRank(object):
 
 		return sentences
 
-	def PowerMethod(self, CM, n, e):
-		Po = numpy.array([1 / float(n) for i in range(n)])
-		t = 0
-		delta = float('-inf')
+	def PageRank(self,CM, n, maxerr = .0001):
+		Po = numpy.zeros(n)
+		P1 = numpy.ones(n)
 		M = numpy.array(CM)
-
-		while delta < e:
-			t = t + 1
-			M = M.transpose()
-			P1 = numpy.dot(M, Po)
-			diff = numpy.subtract(P1, Po)
-			delta = numpy.linalg.norm(diff)
+		t = 0
+		while (numpy.sum(numpy.abs(P1-Po)) > maxerr) and (t < 100):
 			Po = numpy.copy(P1)
-
+			t = t + 1
+			P1 = numpy.matmul(Po, M)
+			print(numpy.sum(numpy.abs(P1-Po)))
+		print(t)
 		return list(Po)
 
 	def buildMatrix(self, sentences):
@@ -72,11 +60,6 @@ class LexRank(object):
 	def buildSummary(self, sentences, n):
 		sentences = sorted(sentences, key=lambda x: x.getLexRankScore(), reverse=True)
 		summary = []
-		# sum_len = 0
-
-		# while sum_len < n:
-		#     summary += [sentences[i]]
-		#     sum_len += len(sentences[i].getStemmedWords())
 
 		for i in range(n):
 			summary += [sentences[i]]
@@ -147,28 +130,24 @@ class Preprocessing(object):
 	def processFile(self, file_path_and_name):
 		try:
 
-			f = open(file_path_and_name, 'rb')
-			text = f.read()
+			f = open(file_path_and_name, 'r')
+			text_0 = f.read()
 
-			# soup = BeautifulSoup(text,"html.parser")
-			# text = soup.getText()
-			# text = re.sub("APW19981212.0848","",text)
-			# text = re.sub("APW19981129.0668","",text)
-			# text = re.sub("NEWSWIRE","",text)
-			# text_1 = re.search(r"<TEXT>.*</TEXT>", text, re.DOTALL)
-			# text_1 = re.sub("<TEXT>\n", "", text_1.group(0))
-			# text_1 = re.sub("\n</TEXT>", "", text_1)
-			#
-			# # replace all types of quotations by normal quotes
-			# text_1 = re.sub("\n", " ", text_1)
-			# text_1 = re.sub(" +", " ", text_1)
-			# text_1 = re.sub("\'\'","\"",text_1)
-			# text_1 = re.sub("\`\`","\"",text_1)
+			# code 2007
+			text_1 = re.search(r"<TEXT>.*</TEXT>", text_0, re.DOTALL)
+			text_1 = re.sub("<TEXT>\n", "", text_1.group(0))
+			text_1 = re.sub("\n</TEXT>", "", text_1)
+
+			text_1 = re.sub("<P>", "", text_1)
+			text_1 = re.sub("</P>", "", text_1)
+			text_1 = re.sub("\n", " ", text_1)
+			text_1 = re.sub("\"", "\"", text_1)
+			text_1 = re.sub("''", "\"", text_1)
+			text_1 = re.sub("``", "\"", text_1)
+			text_1 = re.sub(" +", " ", text_1)
 
 			sent_tokenizer = nltk.data.load('tokenizers/punkt/english.pickle')
-
-			lines = sent_tokenizer.tokenize(text.strip())
-			text_1 = lines
+			lines = sent_tokenizer.tokenize(text_1.strip())
 
 			sentences = []
 			porter = nltk.PorterStemmer()
@@ -179,9 +158,9 @@ class Preprocessing(object):
 				line = nltk.word_tokenize(sent)
 
 				stemmed_sentence = [porter.stem(word) for word in line]
-				stemmed_sentence = filter(lambda x: x != '.' and x != '`' and x != ',' and x != '?' and x != "'"
+				stemmed_sentence = list(filter(lambda x: x != '.' and x != '`' and x != ',' and x != '?' and x != "'"
 				                                    and x != '!' and x != '''"''' and x != "''" and x != "'s",
-				                          stemmed_sentence)
+				                          stemmed_sentence))
 				if stemmed_sentence != []:
 					sentences.append(sentence(file_path_and_name, stemmed_sentence, OG_sent))
 
@@ -189,95 +168,15 @@ class Preprocessing(object):
 
 
 		except IOError:
-			print 'Oops! File not found', file_path_and_name
+			print('Oops! File not found', file_path_and_name)
 			return [sentence(file_path_and_name, [], [])]
-
-	def use_full_names(self, doc):
-		names = self.getNames(doc)
-
-		for i in range(len(doc)):
-			doc[i] = self.getLongName(doc[i], names)
-		return doc
-
-	def getNames(self, doc):
-
-		doc = ' '.join(doc).split()
-
-		tags = st.tag(doc)
-		doc = ' '.join(doc)
-
-		names = []
-
-		flag1 = False
-
-		for i in range(1, len(tags)):
-			tag1 = tags[i - 1]
-			tag2 = tags[i]
-
-			if i + 1 < len(tags):
-				tag3 = tags[i + 1]
-				if tag1[1] == 'PERSON' and tag2[1] == 'PERSON' and tag3[1] == 'PERSON':
-					name = tag1[0] + ' ' + tag2[0] + ' ' + tag3[0]
-					if doc.find(name) > -1:
-						names.append(name)
-						i = i + 3
-						flag1 = True
-
-			if tag1[1] == 'PERSON' and tag2[1] == 'PERSON' and not flag1 and i < len(tags):
-				name = tag1[0] + ' ' + tag2[0]
-				if doc.find(name) > -1:
-					names.append(name)
-					i = i + 2
-				else:
-					i = i + 1
-		return names
-
-	def getLongName(self, sentence, names):
-		sentence = sentence.split(" ")
-
-		i = 0
-		while i < len(sentence):
-			word1 = sentence[i]
-			for name in names:
-				flag = False
-
-				if i + 1 != len(sentence):
-					word2 = sentence[i + 1]
-					_2words = word1 + ' ' + word2
-					if self.begins_or_ends_with(_2words, name) and _2words != name:
-						if i == len(sentence) - 2:
-							print sentence[i - 1] + ' ' + _2words, name
-							sentence[i] = name
-							sentence = sentence[:i] + [name]
-							flag = True
-
-						else:
-							temp = _2words + ' ' + sentence[i + 2]
-							if temp != name and temp[:len(temp) - 1] != name:
-								sentence = sentence[:i] + [name] + sentence[i + 2:]
-								flag = True
-
-				# check one word at a time
-				if self.begins_or_ends_with(word1, name) and not flag:
-					if i == len(sentence) - 1:
-						sentence[i] = name
-
-					else:
-						if sentence[i + 1] != name.split(" ")[1]:
-							sentence[i] = name
-			i += 1
-
-		return ' '.join(sentence)
-
-	def begins_or_ends_with(self, word, name):
-		return name[:len(word)] == word or name[len(name) - len(word):] == word
 
 	def get_file_path(self, file_name):
 		for root, dirs, files in os.walk(os.getcwd()):
 			for name in files:
 				if name == file_name:
 					return os.path.join(root, name)
-		print "Error! file was not found!!"
+		print("Error! file was not found!!")
 		return ""
 
 	def get_all_files(self, path=None):
@@ -372,9 +271,9 @@ class DocumentSim(object):
 if __name__ == '__main__':
 
 	lexRank = LexRank()
-	doc_folders = os.walk("Data_DUC_2007/Documents").next()[1]
+	doc_folders = os.listdir("Data_DUC_2007/Documents")
 	total_summary = []
-	summary_length = 6
+	summary_length = 14
 
 	for folder in doc_folders:
 		path = os.path.join("Data_DUC_2007/Documents/", '') + folder
@@ -382,9 +281,7 @@ if __name__ == '__main__':
 		doc_summary = []
 		summary = lexRank.main(summary_length, path)
 		for sentences in summary:
-			# print "\n", sentences.getOGwords(), "\n"
 			text_append = re.sub("\n", "", sentences.getOGwords())
-			# text_append = text_append.strip("'")
 			text_append = text_append + " "
 			doc_summary.append(text_append)
 		total_summary.append(doc_summary)
