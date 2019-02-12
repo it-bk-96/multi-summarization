@@ -128,58 +128,6 @@ class sentence(object):
 
 class Preprocessing(object):
 
-	def processFile(self, file_path_and_name):
-		try:
-			# Đọc file
-			f = open(file_path_and_name, 'r')
-			text_0 = f.read()
-
-			# code 2007
-			text_1 = re.search(r"<TEXT>.*</TEXT>", text_0, re.DOTALL)
-			text_1 = re.sub("<TEXT>\n", "", text_1.group(0))
-			text_1 = re.sub("\n</TEXT>", "", text_1)
-
-			# Xử lý các kí tự để lấy ra chuỗi text trong file html
-			text_1 = re.sub("<P>", "", text_1)
-			text_1 = re.sub("</P>", "", text_1)
-			text_1 = re.sub("\n", " ", text_1)
-
-			text_1 = re.sub("\"", "\"", text_1)
-			text_1 = re.sub("''", "\"", text_1)
-			text_1 = re.sub("``", "\"", text_1)
-
-			text_1 = re.sub(" +", " ", text_1)
-
-			# tách câu
-			sent_tokenizer = nltk.data.load('tokenizers/punkt/english.pickle')
-			lines = sent_tokenizer.tokenize(text_1.strip())
-
-			sentences = []
-			porter = nltk.PorterStemmer()
-
-			for sent in lines:
-				# Giữ lại câu gốc trước khi tách từ
-				OG_sent = sent[:]
-
-				# Đưa chữ viết hoa về hết viết thường
-				sent = sent.strip().lower()
-				line = nltk.word_tokenize(sent)
-
-				# Tách từ
-				stemmed_sentence = [porter.stem(word) for word in line]
-				stemmed_sentence = list(filter(lambda x: x != '.' and x != '`' and x != ',' and x != '?' and x != "'"
-				                                    and x != '!' and x != '''"''' and x != "''" and x != "'s",
-				                          stemmed_sentence))
-				if stemmed_sentence != []:
-					sentences.append(sentence(file_path_and_name, stemmed_sentence, OG_sent))
-
-			return sentences
-
-
-		except IOError:
-			print('Oops! File not found', file_path_and_name)
-			return [sentence(file_path_and_name, [], [])]
-
 	def processFileVietNamese(self, file_path_and_name):
 		try:
 			# Đọc file

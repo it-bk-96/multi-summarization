@@ -8,8 +8,8 @@ import re
 # 	os.makedirs(src + "/Documents" + "/cluster_" + str(i))
 
 
-src_vn = '/home/gvt/Desktop/multi-summarization/MMR-Python3.6-VietNamese/Data_Chưa_tách_từ/Human_Summaries'
-src = '/home/gvt/Desktop/multi-summarization/MMR-Python3.6-VietNamese/Data_200_Cluster_VN_Raw'
+src_vn = '/home/giangvu/Desktop/multi-summarization/MMR-Python3.6-VietNamese/Data_Chưa_tách_từ/Human_Summaries'
+src = '/home/giangvu/Desktop/multi-summarization/MMR-Python3.6-VietNamese/Data_200_Cluster_VN_Raw'
 
 regex_string = r"\w+\.ref\d\.txt$"
 # regex_string = r"^\d+\.body\.txt$"

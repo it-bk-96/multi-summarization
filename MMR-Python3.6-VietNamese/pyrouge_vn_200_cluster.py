@@ -138,10 +138,10 @@ def rouge_l(peer, models, alpha):
 start_time = time.time()
 
 if __name__ == "__main__":
-	system_path = "/home/gvt/Desktop/multi-summarization/MMR-Python3.6-VietNamese/Data_VN_200_cluster/MMR_results/"
-	human_path = "/home/gvt/Desktop/multi-summarization/MMR-Python3.6-VietNamese/Data_VN_200_cluster/Human_Summaries/"
-	system_path_chua_tach_tu = "/home/gvt/Desktop/multi-summarization/MMR-Python3.6-VietNamese/Data_Chưa_tách_từ/MMR_results/"
-	human_path_chua_tach_tu = "/home/gvt/Desktop/multi-summarization/MMR-Python3.6-VietNamese/Data_Chưa_tách_từ/Human_Summaries/"
+	system_path = "/home/giangvu/Desktop/multi-summarization/MMR-Python3.6-VietNamese/Data_VN_200_cluster/MMR_results/"
+	human_path = "/home/giangvu/Desktop/multi-summarization/MMR-Python3.6-VietNamese/Data_VN_200_cluster/Human_Summaries/"
+	system_path_chua_tach_tu = "/home/giangvu/Desktop/multi-summarization/MMR-Python3.6-VietNamese/Data_Chưa_tách_từ/MMR_results/"
+	human_path_chua_tach_tu = "/home/giangvu/Desktop/multi-summarization/MMR-Python3.6-VietNamese/Data_Chưa_tách_từ/Human_Summaries/"
 
 	arr_rouge_precision = []
 	arr_rouge_recall = []

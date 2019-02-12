@@ -2,6 +2,7 @@ import os
 import math
 import sentence
 import nltk
+nltk.download('punkt')
 from pyvi import ViTokenizer
 
 # ---------------------------------------------------------------------------------

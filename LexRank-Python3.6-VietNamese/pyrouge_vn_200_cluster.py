@@ -138,8 +138,8 @@ def rouge_l(peer, models, alpha):
 start_time = time.time()
 
 if __name__ == "__main__":
-	system_path = "/home/gvt/Desktop/multi-summarization/LexRank-Python3.6-VietNamese/Data_Chưa_tách_từ/LexRank_results/"
-	human_path = "/home/gvt/Desktop/multi-summarization/LexRank-Python3.6-VietNamese/Data_Chưa_tách_từ/Human_Summaries/"
+	system_path = "/home/giangvu/Desktop/multi-summarization/LexRank-Python3.6-VietNamese/Data_Chưa_tách_từ/LexRank_results/"
+	human_path = "/home/giangvu/Desktop/multi-summarization/LexRank-Python3.6-VietNamese/Data_Chưa_tách_từ/Human_Summaries/"
 
 	arr_rouge_precision = []
 	arr_rouge_recall = []
