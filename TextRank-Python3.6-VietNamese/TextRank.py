@@ -76,7 +76,8 @@ class Preprocessing(object):
 			sentences = []
 
 			# modelling each sentence in file as sentence object
-			for line in lines:
+			for i in range(len(lines)):
+				line = lines[i]
 				# giữ lại câu gốc
 				OG_sent = line[:]
 
@@ -84,10 +85,12 @@ class Preprocessing(object):
 				line = line.strip().lower()
 
 				# tách từ
-				stemmed_sentence = ViTokenizer.tokenize(line)
+				stemmed_sentence = ViTokenizer.tokenize(line).split()
 				stemmed_sentence = list(filter(lambda x: x != '.' and x != '`' and x != ',' and x != '?' and x != "'"
 				                                         and x != '!' and x != '''"''' and x != "''" and x != "'s",
 				                               stemmed_sentence))
+				if ((i + 1) == len(lines)) and (len(stemmed_sentence) <= 5):
+					break
 				if stemmed_sentence != []:
 					sentences.append(sentence(stemmed_sentence, OG_sent))
 

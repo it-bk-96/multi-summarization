@@ -136,7 +136,7 @@ def rouge_l(peer, models, alpha):
 
 
 start_time = time.time()
-
+from pyvi import ViTokenizer
 if __name__ == "__main__":
 	system_path = "/home/giangvu/Desktop/multi-summarization/TextRank-Python3.6-VietNamese/Data_Chưa_tách_từ/TextRank_results/"
 	human_path = "/home/giangvu/Desktop/multi-summarization/TextRank-Python3.6-VietNamese/Data_Chưa_tách_từ/Human_Summaries/"
@@ -148,13 +148,13 @@ if __name__ == "__main__":
 		id = file.split("_")[1].split(".")[0]
 
 		file_name_system = system_path + file
-		text_system = open(file_name_system, 'r').read().strip().replace("\n", "")
+		text_system = ViTokenizer.tokenize(open(file_name_system, 'r').read().strip().replace("\n", ""))
 
 		file_name_human_1 = human_path + "cluster_" + id + ".ref1.txt"
-		text_human_1 = open(file_name_human_1, 'r').read().strip().replace("\n", "")
+		text_human_1 = ViTokenizer.tokenize(open(file_name_human_1, 'r').read().strip().replace("\n", ""))
 
 		file_name_human_2 = human_path + "cluster_" + id + ".ref2.txt"
-		text_human_2 = open(file_name_human_2, 'r').read().strip().replace("\n", "")
+		text_human_2 = ViTokenizer.tokenize(open(file_name_human_2, 'r').read().strip().replace("\n", ""))
 
 		arr_rouge_precision.append(rouge_1(text_system, [text_human_1, text_human_2], 1))
 		arr_rouge_recall.append(rouge_1(text_system, [text_human_1, text_human_2], 0))
