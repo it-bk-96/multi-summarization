@@ -56,8 +56,8 @@ def processFile(file_name):
 	sentences = []
 
 	# modelling each sentence in file as sentence object
-	for line in lines:
-
+	for i in range(len(lines)):
+		line = lines[i]
 		# giữ lại câu gốc
 		originalWords = line[:]
 
@@ -65,14 +65,17 @@ def processFile(file_name):
 		line = line.strip().lower()
 
 		# tách từ
-		stemmedSent = ViTokenizer.tokenize(line)
+		stemmedSent = ViTokenizer.tokenize(line).split()
 
-		stemmedSent = list(filter(lambda x: x != '.' and x != '`' and x != ',' and x != '?' and x != "'"
-		                               and x != '!' and x != '''"''' and x != "''" and x != "'s", stemmedSent))
+		stemmedSent = list(filter(lambda x: x != '.' and x != '`' and x != ',' and x != '?' and x != "'" and x != ":"
+		                               and x != '!' and x != '''"''' and x != "''" and x != '-', stemmedSent))
 
+		if ((i + 1) == len(lines)) and (len(stemmedSent) <= 5):
+			break
 		# list of sentence objects
 		if stemmedSent != []:
 			sentences.append(sentence.sentence(file_name, stemmedSent, originalWords))
+
 
 	return sentences
 
@@ -306,6 +309,7 @@ if __name__ == '__main__':
 
 	# set the main Document folder path where the subfolders are present
 	main_folder_path = os.getcwd() + "/Data_Chưa_tách_từ/Documents"
+	human_folder_path = os.getcwd() + "/Data_Chưa_tách_từ/Human_Summaries/"
 
 	# read in all the subfolder names present in the main folder
 	for folder in os.listdir(main_folder_path):
@@ -316,7 +320,14 @@ if __name__ == '__main__':
 
 		# find all files in the sub folder selected
 		files = os.listdir(curr_folder)
-
+		file_human_1 = human_folder_path + folder + ".ref1.txt"
+		file_human_2 = human_folder_path + folder + ".ref2.txt"
+		f = open(file_human_1, 'r')
+		text_1 = f.read()
+		text_2 = ViTokenizer.tokenize(text_1)
+		length_word = len(text_2.split())
+		print(text_2.split())
+		exit()
 		sentences = []
 
 		for file in files:

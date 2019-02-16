@@ -4,7 +4,7 @@ import os
 import six
 import time
 import nltk
-
+from pyvi import ViTokenizer
 def _ngrams(words, n):
 	queue = collections.deque(maxlen=n)
 	for w in words:
