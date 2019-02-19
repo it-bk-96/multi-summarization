@@ -136,41 +136,41 @@ def rouge_l(peer, models, alpha):
 
 
 start_time = time.time()
-
+from pyvi import ViTokenizer
 if __name__ == "__main__":
-	system_path = "/home/giangvu/Desktop/multi-summarization/MMR-Python3.6-VietNamese/Data_VN_200_cluster/MMR_results/"
-	human_path = "/home/giangvu/Desktop/multi-summarization/MMR-Python3.6-VietNamese/Data_VN_200_cluster/Human_Summaries/"
+	# system_path = "/home/giangvu/Desktop/multi-summarization/MMR-Python3.6-VietNamese/Data_VN_200_cluster/MMR_results/"
+	# human_path = "/home/giangvu/Desktop/multi-summarization/MMR-Python3.6-VietNamese/Data_VN_200_cluster/Human_Summaries/"
 	system_path_chua_tach_tu = "/home/giangvu/Desktop/multi-summarization/MMR-Python3.6-VietNamese/Data_Chưa_tách_từ/MMR_results/"
 	human_path_chua_tach_tu = "/home/giangvu/Desktop/multi-summarization/MMR-Python3.6-VietNamese/Data_Chưa_tách_từ/Human_Summaries/"
 
-	arr_rouge_precision = []
-	arr_rouge_recall = []
-	arr_rouge_f1 = []
-	for file in os.listdir(system_path):
-		id = file.split("_")[1].split(".")[0]
-
-		file_name_system = system_path + file
-		text_system = open(file_name_system, 'r').read().strip().replace("\n", "")
-
-		file_name_human_1 = human_path + "cluster_" + id + ".ref1.tok.txt"
-		text_human_1 = open(file_name_human_1, 'r').read().strip().replace("\n", "")
-
-		file_name_human_2 = human_path + "cluster_" + id + ".ref2.tok.txt"
-		text_human_2 = open(file_name_human_2, 'r').read().strip().replace("\n", "")
-
-		arr_rouge_precision.append(rouge_1(text_system, [text_human_1, text_human_2], 1))
-		arr_rouge_recall.append(rouge_1(text_system, [text_human_1, text_human_2], 0))
-		arr_rouge_f1.append(rouge_1(text_system, [text_human_1, text_human_2], 0.5))
-
-	mean_precision = sum(arr_rouge_precision) / len(arr_rouge_precision)
-	mean_recall = sum(arr_rouge_recall) / len(arr_rouge_recall)
-	mean_f1 = sum(arr_rouge_f1) / len(arr_rouge_f1)
-	print("Rouge-1 với system và human đã tách từ: ")
-	print("%.10s" % ("precision") + " | " + "%.10s" % ("recall") + " | " + "%.10s" % ("F1"))
-	print("%.8f" % (mean_precision), "%.7f" % (mean_recall),
-	      "%.7f" % (mean_f1))
-	print("-"*40)
-	print("Execution time: " + str(time.time() - start_time))
+	# arr_rouge_precision = []
+	# arr_rouge_recall = []
+	# arr_rouge_f1 = []
+	# for file in os.listdir(system_path):
+	# 	id = file.split("_")[1].split(".")[0]
+	#
+	# 	file_name_system = system_path + file
+	# 	text_system = open(file_name_system, 'r').read().strip().replace("\n", "")
+	#
+	# 	file_name_human_1 = human_path + "cluster_" + id + ".ref1.tok.txt"
+	# 	text_human_1 = open(file_name_human_1, 'r').read().strip().replace("\n", "")
+	#
+	# 	file_name_human_2 = human_path + "cluster_" + id + ".ref2.tok.txt"
+	# 	text_human_2 = open(file_name_human_2, 'r').read().strip().replace("\n", "")
+	#
+	# 	arr_rouge_precision.append(rouge_1(text_system, [text_human_1, text_human_2], 1))
+	# 	arr_rouge_recall.append(rouge_1(text_system, [text_human_1, text_human_2], 0))
+	# 	arr_rouge_f1.append(rouge_1(text_system, [text_human_1, text_human_2], 0.5))
+	#
+	# mean_precision = sum(arr_rouge_precision) / len(arr_rouge_precision)
+	# mean_recall = sum(arr_rouge_recall) / len(arr_rouge_recall)
+	# mean_f1 = sum(arr_rouge_f1) / len(arr_rouge_f1)
+	# print("Rouge-1 với system và human đã tách từ: ")
+	# print("%.10s" % ("precision") + " | " + "%.10s" % ("recall") + " | " + "%.10s" % ("F1"))
+	# print("%.8f" % (mean_precision), "%.7f" % (mean_recall),
+	#       "%.7f" % (mean_f1))
+	# print("-"*40)
+	# print("Execution time: " + str(time.time() - start_time))
 
 	print("-"*100)
 
@@ -181,13 +181,13 @@ if __name__ == "__main__":
 	for file in os.listdir(system_path_chua_tach_tu):
 		id = file.split("_")[1].split(".")[0]
 		file_name_system = system_path_chua_tach_tu + file
-		text_system = open(file_name_system, 'r').read().strip()
+		text_system = ViTokenizer.tokenize(open(file_name_system, 'r').read().strip())
 
 		file_name_human_1 = human_path_chua_tach_tu + "cluster_" + id + ".ref1.txt"
-		text_human_1 = open(file_name_human_1, 'r').read().strip()
+		text_human_1 = ViTokenizer.tokenize(open(file_name_human_1, 'r').read().strip())
 
 		file_name_human_2 = human_path_chua_tach_tu + "cluster_" + id + ".ref2.txt"
-		text_human_2 = open(file_name_human_2, 'r').read().strip()
+		text_human_2 = ViTokenizer.tokenize(open(file_name_human_2, 'r').read().strip())
 
 		arr_rouge_precision.append(rouge_1(text_system, [text_human_1, text_human_2], 1))
 		arr_rouge_recall.append(rouge_1(text_system, [text_human_1, text_human_2], 0))

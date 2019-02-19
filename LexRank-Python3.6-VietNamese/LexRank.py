@@ -46,8 +46,8 @@ class LexRank(object):
             Po = numpy.copy(P1)
             t = t + 1
             P1 = numpy.matmul(Po, M)
-            print(numpy.sum(numpy.abs(P1 - Po)))
-        print(t)
+        #     print(numpy.sum(numpy.abs(P1 - Po)))
+        # print(t)
         return list(Po)
 
     def buildMatrix(self, sentences):
@@ -62,8 +62,13 @@ class LexRank(object):
     def buildSummary(self, sentences, n):
         sentences = sorted(sentences, key=lambda x: x.getLexRankScore(), reverse=True)
         summary = []
-        for i in range(n):
+        i = 0
+        length_summary = len(ViTokenizer.tokenize(sentences[i].getOGwords().strip()).split())
+        while (length_summary < n):
+            i += 1
             summary += [sentences[i]]
+            length_summary += len(ViTokenizer.tokenize(sentences[i].getOGwords().strip()).split())
+
         return summary
 
     def normalize(self, numbers):
@@ -152,10 +157,9 @@ class Preprocessing(object):
                 stemmedSent = ViTokenizer.tokenize(line).split()
 
                 stemmedSent = list(
-                    filter(
-                        lambda x: x != '.' and x != '`' and x != ',' and x != '?' and x != "'" and x != ')' and x != '('
-                                  and x != '+' and x != '-' and x != '&' and x != '/' and x != '!' and x != '''"''' and x != "''" and x != ':',
-                        stemmedSent))
+                    filter(lambda x: x != '.' and x != '`' and x != ',' and x != '?' and x != "'" and x != ":"
+                                     and x != '!' and x != '''"''' and x != "''" and x != '-' and x not in stop_word,
+                           stemmedSent))
 
                 if ((i + 1) == len(lines)) and (len(stemmedSent) <= 5):
                     break
@@ -262,8 +266,11 @@ class DocumentSim(object):
 if __name__ == '__main__':
     lexRank = LexRank()
     main_folder_path = os.getcwd() + "/Data_Chưa_tách_từ/Documents"
+    human_folder_path = os.getcwd() + "/Data_Chưa_tách_từ/Human_Summaries/"
 
-    summary_length = 5
+    stop_word = list(map(lambda x: "_".join(x.split()),
+                         open("/home/giangvu/Desktop/multi-summarization/vietnamese-stopwords.txt", 'r').read().split(
+                             "\n")))
 
     for folder in os.listdir(main_folder_path):
 
@@ -274,8 +281,16 @@ if __name__ == '__main__':
         results_folder = os.getcwd() + "/Data_Chưa_tách_từ/LexRank_results"
         # find all files in the sub folder selected
 
+        file_human_1 = human_folder_path + folder + ".ref1.txt"
+        file_human_2 = human_folder_path + folder + ".ref2.txt"
+        text_1 = open(file_human_1, 'r').read()
+        text_2 = open(file_human_2, 'r').read()
+        text_1_token = ViTokenizer.tokenize(text_1)
+        text_2_token = ViTokenizer.tokenize(text_2)
+        length_summary = int((len(text_1_token.split()) + len(text_1_token.split())) / 2)
+
         doc_summary = []
-        summary = lexRank.main(summary_length, curr_folder)
+        summary = lexRank.main(length_summary, curr_folder)
 
         for sentences in summary:
             # print("\n", sentences.getOGwords(), "\n")

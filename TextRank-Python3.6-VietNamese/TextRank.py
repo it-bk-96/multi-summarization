@@ -22,9 +22,14 @@ class TextRank(object):
 
 		summary = []
 		top_index = [i for i,j in sorted(enumerate(node_weights), key=lambda x: x[1],reverse=True)[:n]]
+		length_summary = len(ViTokenizer.tokenize(sentences[top_index[0]].getOGwords().strip()).split())
 
 		for i in top_index:
+			if (length_summary > n):
+				break
 			summary += [sentences[i]]
+			length_summary += len(ViTokenizer.tokenize(sentences[i].getOGwords().strip()).split())
+
 		return summary
 
 	def main(self, n, path):
@@ -86,8 +91,8 @@ class Preprocessing(object):
 
 				# tách từ
 				stemmed_sentence = ViTokenizer.tokenize(line).split()
-				stemmed_sentence = list(filter(lambda x: x != '.' and x != '`' and x != ',' and x != '?' and x != "'"
-				                                         and x != '!' and x != '''"''' and x != "''" and x != "'s",
+				stemmed_sentence = list(filter(lambda x: x != '.' and x != '`' and x != ',' and x != '?' and x != "'" and x != ":"
+		                               and x != '!' and x != '''"''' and x != "''" and x != '-' and x not in stop_word,
 				                               stemmed_sentence))
 				if ((i + 1) == len(lines)) and (len(stemmed_sentence) <= 5):
 					break
@@ -133,23 +138,30 @@ if __name__ == '__main__':
 	textRank = TextRank()
 	doc_folders = os.listdir("Data_Chưa_tách_từ/Documents")
 	total_summary = []
-	summary_length = 5
+	human_folder_path = os.getcwd() + "/Data_Chưa_tách_từ/Human_Summaries/"
+
+	stop_word = list(map(lambda x: "_".join(x.split()), open("/home/giangvu/Desktop/multi-summarization/vietnamese-stopwords.txt", 'r').read().split("\n")))
 
 	for folder in doc_folders:
 		path = os.path.join("Data_Chưa_tách_từ/Documents/", '') + folder
 		print("Running TextRank Summarizer for files in folder: ", folder)
 		doc_summary = []
-		summary = textRank.main(summary_length, path)
+
+		file_human_1 = human_folder_path + folder + ".ref1.txt"
+		file_human_2 = human_folder_path + folder + ".ref2.txt"
+		text_1 = open(file_human_1, 'r').read()
+		text_2 = open(file_human_2, 'r').read()
+		text_1_token = ViTokenizer.tokenize(text_1)
+		text_2_token = ViTokenizer.tokenize(text_2)
+		length_summary = int((len(text_1_token.split()) + len(text_1_token.split())) / 2)
+
+		summary = textRank.main(length_summary, path)
 		for sentences in summary:
 			text_append = re.sub("\n", "", sentences.getOGwords())
 			text_append = text_append + " "
 			doc_summary.append(text_append)
-		total_summary.append(doc_summary)
-	os.chdir("Data_Chưa_tách_từ/TextRank_results")
 
-	for i in range(len(doc_folders)):
-		myfile = doc_folders[i] + ".TextRank"
-		f = open(myfile, 'w')
-		for j in range(summary_length):
-			f.write(total_summary[i][j])
-		f.close()
+		results_folder = os.getcwd() + "/Data_Chưa_tách_từ/TextRank_results"
+
+		with open(os.path.join(results_folder, (str(folder) + ".TextRank")), "w") as fileOut:
+			fileOut.write("\n".join(doc_summary))

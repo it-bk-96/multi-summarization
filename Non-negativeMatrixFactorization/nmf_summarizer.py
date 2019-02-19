@@ -115,7 +115,7 @@ def processFile(file_name):
 		stemmedSent = ViTokenizer.tokenize(line).split()
 
 		stemmedSent = list(filter(lambda x: x != '.' and x != '`' and x != ',' and x != '?' and x != "'" and x != ":"
-		                               and x != '!' and x != '''"''' and x != "''" and x != '-', stemmedSent))
+		                               and x != '!' and x != '''"''' and x != "''" and x != '-' and x not in stop_word, stemmedSent))
 
 		if ((i + 1) == len(lines)) and (len(stemmedSent) <= 5):
 			break
@@ -239,6 +239,8 @@ if __name__ == '__main__':
 	main_folder_path = os.getcwd() + "/Data_Chưa_tách_từ/Documents"
 	human_folder_path = os.getcwd() + "/Data_Chưa_tách_từ/Human_Summaries/"
 
+	stop_word = list(map(lambda x: "_".join(x.split()), open("/home/giangvu/Desktop/multi-summarization/vietnamese-stopwords.txt", 'r').read().split("\n")))
+
 	# read in all the subfolder names present in the main folder
 	for folder in os.listdir(main_folder_path):
 		start_time = time.time()
@@ -279,7 +281,9 @@ if __name__ == '__main__':
 				index = vocabulary.index(word)
 				A[index][i] += tf_sentence[word]
 
-		model = NMF(n_components=10, init='random', random_state=0)
+		rank_A = np.linalg.matrix_rank(A)
+		print(rank_A)
+		model = NMF(n_components=rank_A, init='random', random_state=0)
 		W = model.fit_transform(A)
 		H = model.components_
 

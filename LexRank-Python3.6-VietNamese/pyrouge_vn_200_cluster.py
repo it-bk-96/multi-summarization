@@ -163,7 +163,7 @@ if __name__ == "__main__":
 	mean_precision = sum(arr_rouge_precision) / len(arr_rouge_precision)
 	mean_recall = sum(arr_rouge_recall) / len(arr_rouge_recall)
 	mean_f1 = sum(arr_rouge_f1) / len(arr_rouge_f1)
-	print("Rouge-1 với system và human chưa tách từ: ")
+	print("Rouge-1 với system và human tách từ: ")
 	print("%.10s" % ("precision") + " | " + "%.10s" % ("recall") + " | " + "%.10s" % ("F1"))
 	print("%.8f" % (mean_precision), "%.7f" % (mean_recall),
 	      "%.7f" % (mean_f1))

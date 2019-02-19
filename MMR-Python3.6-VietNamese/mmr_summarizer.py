@@ -68,7 +68,7 @@ def processFile(file_name):
 		stemmedSent = ViTokenizer.tokenize(line).split()
 
 		stemmedSent = list(filter(lambda x: x != '.' and x != '`' and x != ',' and x != '?' and x != "'" and x != ":"
-		                               and x != '!' and x != '''"''' and x != "''" and x != '-', stemmedSent))
+		                               and x != '!' and x != '''"''' and x != "''" and x != '-' and x not in stop_word, stemmedSent))
 
 		if ((i + 1) == len(lines)) and (len(stemmedSent) <= 5):
 			break
@@ -258,12 +258,13 @@ def bestSentence(sentences, query, IDF):
 # ---------------------------------------------------------------------------------
 def makeSummary(sentences, best_sentence, query, summary_length, lambta, IDF):
 	summary = [best_sentence]
-	sum_len = len(best_sentence.getPreProWords())
+
+	sum_len = len(ViTokenizer.tokenize(best_sentence.getOriginalWords()).split())
 
 	MMRval = {}
 
 	# keeping adding sentences until number of words exceeds summary length
-	while (sum_len < summary_length):
+	while (sum_len <= summary_length):
 		MMRval = {}
 
 		for sent in sentences:
@@ -272,7 +273,7 @@ def makeSummary(sentences, best_sentence, query, summary_length, lambta, IDF):
 		maxxer = max(MMRval, key=MMRval.get)
 		summary.append(maxxer)
 		sentences.remove(maxxer)
-		sum_len += len(maxxer.getPreProWords())
+		sum_len += len(ViTokenizer.tokenize(maxxer.getOriginalWords()).split())
 
 	return summary
 
@@ -311,6 +312,8 @@ if __name__ == '__main__':
 	main_folder_path = os.getcwd() + "/Data_Chưa_tách_từ/Documents"
 	human_folder_path = os.getcwd() + "/Data_Chưa_tách_từ/Human_Summaries/"
 
+	stop_word = list(map(lambda x: "_".join(x.split()), open("/home/giangvu/Desktop/multi-summarization/vietnamese-stopwords.txt", 'r').read().split("\n")))
+
 	# read in all the subfolder names present in the main folder
 	for folder in os.listdir(main_folder_path):
 
@@ -320,14 +323,15 @@ if __name__ == '__main__':
 
 		# find all files in the sub folder selected
 		files = os.listdir(curr_folder)
+
 		file_human_1 = human_folder_path + folder + ".ref1.txt"
 		file_human_2 = human_folder_path + folder + ".ref2.txt"
-		f = open(file_human_1, 'r')
-		text_1 = f.read()
-		text_2 = ViTokenizer.tokenize(text_1)
-		length_word = len(text_2.split())
-		print(text_2.split())
-		exit()
+		text_1 = open(file_human_1, 'r').read()
+		text_2 = open(file_human_2, 'r').read()
+		text_1_token = ViTokenizer.tokenize(text_1)
+		text_2_token = ViTokenizer.tokenize(text_2)
+		length_summary = int((len(text_1_token.split()) + len(text_1_token.split()))/2)
+
 		sentences = []
 
 		for file in files:
@@ -344,7 +348,7 @@ if __name__ == '__main__':
 		best1sentence = bestSentence(sentences, query, IDF_w)
 
 		# build summary by adding more relevant sentences
-		summary = makeSummary(sentences, best1sentence, query, 100, 0.5, IDF_w)
+		summary = makeSummary(sentences, best1sentence, query, length_summary, 0.5, IDF_w)
 
 		final_summary = ""
 		for sent in summary:

@@ -136,7 +136,6 @@ def rouge_l(peer, models, alpha):
 
 
 start_time = time.time()
-from pyvi import ViTokenizer
 if __name__ == "__main__":
 	system_path = "/home/giangvu/Desktop/multi-summarization/Non-negativeMatrixFactorization/Data_Chưa_tách_từ/NMF_results/"
 	human_path = "/home/giangvu/Desktop/multi-summarization/Non-negativeMatrixFactorization/Data_Chưa_tách_từ/Human_Summaries/"
