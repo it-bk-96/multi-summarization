@@ -3,8 +3,6 @@ from nltk.tokenize import sent_tokenize
 from pyvi import ViTokenizer
 from nltk.util import ngrams
 
-
-
 DATA_200_CLUSTERS = 'Data_Non_Token/Documents'
 STOPWORDS = 'stopwords_2.txt'
 FIRST_SENT_DOC = 'first_sentence'
