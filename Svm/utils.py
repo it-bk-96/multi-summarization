@@ -91,7 +91,40 @@ def get_all_doc(path):
 #         write_arr_string(arr_all, TFIDF_UNI + '/' + filename)
 
 
-def cos_similarity(s1, s2, list_sent):
+# def cos_similarity(s1, s2, list_sent):
+#     '''
+#     compute cosine similarity of any sentence with first sentence of once document
+#     :param s1:
+#     :param s2:
+#     :param list_sent:
+#     :return:
+#     '''
+#
+#     numerator = 0
+#     denom1 = 0
+#     denom2 = 0
+#     list_word_1 = s1.split(' ')
+#     list_word_2 = s2.split(' ')
+#
+#     for word in list_word_1:
+#         denom1 += (tf(word, s1) * idf(word, list_sent)) ** 2
+#
+#     for word in list_word_2:
+#         tf_s2 = tf(word, s2)
+#         idf_w = idf(word, list_sent)
+#         denom2 += (tf_s2 * idf_w) ** 2
+#         if word in list_word_1:
+#             numerator += tf(word, s1) * tf_s2 * (idf_w ** 2)
+#     sim = 0.0
+#     try:
+#         sim = numerator / (math.sqrt(denom1) * math.sqrt(denom2))
+#     except Exception:
+#         print(s1)
+#         print(s2)
+#
+#     return sim
+
+def cos_similarity(s1, s2, idf_dict, doc):
     '''
     compute cosine similarity of any sentence with first sentence of once document
     :param s1:
@@ -103,18 +136,22 @@ def cos_similarity(s1, s2, list_sent):
     numerator = 0
     denom1 = 0
     denom2 = 0
-    list_word_1 = s1.split(' ')
-    list_word_2 = s2.split(' ')
+    list_word_s1 = s1.split(' ')
+    list_word_s2 = s2.split(' ')
 
-    for word in list_word_1:
-        denom1 += (tf(word, s1) * idf(word, list_sent)) ** 2
+    all_words = set(list_word_s1 + list_word_s2)
 
-    for word in list_word_2:
-        tf_s2 = tf(word, s2)
-        idf_w = idf(word, list_sent)
-        denom2 += (tf_s2 * idf_w) ** 2
-        if word in list_word_1:
-            numerator += tf(word, s1) * tf_s2 * (idf_w ** 2)
+    tf_arr = {}
+    for word in all_words:
+        tf_arr[word] = tf(word, doc)
+    for word in list_word_s1:
+        denom1 += (tf_arr[word] * idf[word]) ** 2
+
+    for word in list_word_s2:
+
+        denom2 += (tf_arr[word] * idf[word]) ** 2
+        if word in list_word_s1:
+            numerator += (tf_arr[word] * idf[word]) ** 2
     sim = 0.0
     try:
         sim = numerator / (math.sqrt(denom1) * math.sqrt(denom2))
