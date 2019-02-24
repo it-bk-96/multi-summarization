@@ -5,6 +5,7 @@ import math
 from data_interact import write_arr_string
 from collections import Counter
 from sklearn.metrics.pairwise import cosine_similarity
+from nltk.tokenize import sent_tokenize
 
 TOP_TF_UNI = 'Top_TF_Uni'
 TOP_TF_BI = 'Top_TF_Bi'
@@ -200,6 +201,18 @@ def get_list_first_sent():
 #         write_arr_string(similarities, SENT_SIMILARITIES + '/' + filename)
 
 
+def token_sent(input):
+    all_sent = []
+    for clus in os.listdir(input):
+
+        cluster_path = input + '/' + clus
+
+        for filename in os.listdir(cluster_path):
+            with open(cluster_path + "/" + filename) as tex:
+                all_sent.append(sent_tokenize(tex.read().strip()))
+
+    return all_sent
+
 def first_rel_doc(input, output):
     '''
     compute relevant with first sentence of document
@@ -207,7 +220,7 @@ def first_rel_doc(input, output):
     :return:
     '''
 
-    all_sentences = open('data_sent_token', 'r').read().split('\n')
+    all_sentences = token_sent('Data_raw')
 
     for clus in os.listdir(input):
         cluster_path = input + '/' + clus
