@@ -170,34 +170,61 @@ def get_list_first_sent():
     return list_first_sent
 
 
-def first_rel_doc():
+# def first_rel_doc():
+#     '''
+#     compute relevant with first sentence of document
+#     compute by cosine similarity tfidf
+#     :return:
+#     '''
+#
+#     for filename in os.listdir(DATA_REMOVED_STOPWORDS):
+#         print("cal", filename)
+#
+#         similarities = []
+#         list_sent = []
+#         with open(DATA_REMOVED_STOPWORDS + '/' + filename, 'r') as fout:
+#             # read docs, split by '\n------\n' to have list docs separate
+#             files = fout.read().strip().split('\n------\n')
+#             for file in files:
+#                 for sent in file.strip().split('\n'):
+#                     list_sent.append(sent)
+#
+#             for file in files:
+#                 sub_list_sent = file.strip().split('\n')
+#                 first_sent = sub_list_sent[0]
+#                 similarities.append('1.0' + '::' + first_sent)
+#                 for sent in sub_list_sent[:-1]:
+#                     simil_value = cos_similarity(first_sent, sent, list_sent)
+#                     similarities.append(str(simil_value) + '::' + sent)
+#
+#         write_arr_string(similarities, SENT_SIMILARITIES + '/' + filename)
+
+
+def first_rel_doc(input, output):
     '''
     compute relevant with first sentence of document
     compute by cosine similarity tfidf
     :return:
     '''
 
-    for filename in os.listdir(DATA_REMOVED_STOPWORDS):
-        print("cal", filename)
+    all_sentences = open('data_sent_token', 'r').read().split('\n')
 
-        similarities = []
-        list_sent = []
-        with open(DATA_REMOVED_STOPWORDS + '/' + filename, 'r') as fout:
-            # read docs, split by '\n------\n' to have list docs separate
-            files = fout.read().strip().split('\n------\n')
-            for file in files:
-                for sent in file.strip().split('\n'):
-                    list_sent.append(sent)
+    for clus in os.listdir(input):
+        cluster_path = input + '/' + clus
 
-            for file in files:
-                sub_list_sent = file.strip().split('\n')
-                first_sent = sub_list_sent[0]
-                similarities.append('1.0' + '::' + first_sent)
-                for sent in sub_list_sent[:-1]:
-                    simil_value = cos_similarity(first_sent, sent, list_sent)
-                    similarities.append(str(simil_value) + '::' + sent)
+        list_docs = []
+        for filename in os.listdir(cluster_path):
+            with open(cluster_path + '/' + filename, 'r') as f:
+                list_docs.append((filename, f.read().strip()))
 
-        write_arr_string(similarities, SENT_SIMILARITIES + '/' + filename)
+        for namefile, doc in list_docs:
+            similarities = []
 
+            sub_list_sent = doc.strip().split('\n')
+            first_sent = sub_list_sent[0]
+            similarities.append('1.0' + '::' + first_sent)
+            for sent in sub_list_sent[:-1]:
+                simil_value = cos_similarity(first_sent, sent, all_sentences)
+                similarities.append(str(simil_value) + '::' + sent)
 
-freq_word(1)
+            write_arr_string(similarities, output + '/' + clus + '/' + namefile)
