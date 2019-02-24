@@ -145,13 +145,13 @@ def cos_similarity(s1, s2, idf_dict, doc):
     for word in all_words:
         tf_arr[word] = tf(word, doc)
     for word in list_word_s1:
-        denom1 += (tf_arr[word] * idf[word]) ** 2
+        denom1 += (tf_arr[word] * idf_dict[word]) ** 2
 
     for word in list_word_s2:
 
-        denom2 += (tf_arr[word] * idf[word]) ** 2
+        denom2 += (tf_arr[word] * idf_dict[word]) ** 2
         if word in list_word_s1:
-            numerator += (tf_arr[word] * idf[word]) ** 2
+            numerator += (tf_arr[word] * idf_dict[word]) ** 2
     sim = 0.0
     try:
         sim = numerator / (math.sqrt(denom1) * math.sqrt(denom2))
