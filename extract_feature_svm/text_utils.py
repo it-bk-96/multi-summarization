@@ -108,6 +108,14 @@ def tf(word, document):
 
     return dict_words[word]*1.0/count_words
 
+def get_word_freq(word, document):
+    dict_words = get_dict_words_from_doc(document)
+
+    if word not in dict_words:
+        return 0
+
+    return dict_words[word]
+
 def idf(word, documents):
     N = len(documents)
 
