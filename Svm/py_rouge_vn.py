@@ -139,8 +139,8 @@ def rouge_l(peer, models, alpha):
 start_time = time.time()
 
 if __name__ == "__main__":
-    system_path = "/home/hieupd/PycharmProjects/multi_summari_lex_mmr_tex/data/Data_Chưa_tách_từ/LexRank_results/"
-    human_path = "/home/hieupd/PycharmProjects/multi_summari_lex_mmr_tex/data/Data_Chưa_tách_từ/Human_Summaries/"
+    system_path = '/home/hieupd/PycharmProjects/multi_summari_svm/results/'
+    human_path = "/home/hieupd/PycharmProjects/multi_summari_svm/human_test/"
 
     arr_rouge_precision = []
     arr_rouge_recall = []
@@ -151,10 +151,10 @@ if __name__ == "__main__":
         file_name_system = system_path + file
         text_system = ViTokenizer.tokenize(open(file_name_system, 'r').read().strip().replace("\n", ""))
 
-        file_name_human_1 = human_path + "cluster_" + id + ".ref1.txt"
+        file_name_human_1 = human_path + "cluster_" + id + "/cluster_" + id + ".ref1.txt"
         text_human_1 = ViTokenizer.tokenize(open(file_name_human_1, 'r').read().strip().replace("\n", ""))
 
-        file_name_human_2 = human_path + "cluster_" + id + ".ref2.txt"
+        file_name_human_2 = human_path + "cluster_" + id + "/cluster_" + id + ".ref2.txt"
         text_human_2 = ViTokenizer.tokenize(open(file_name_human_2, 'r').read().strip().replace("\n", ""))
 
         arr_rouge_precision.append(rouge_1(text_system, [text_human_1, text_human_2], 1))

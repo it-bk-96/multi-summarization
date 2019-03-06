@@ -1,0 +1,5 @@
+Rouge-1 với system và human chưa tách từ:
+precision | recall | F1
+0.42585227 0.3683432 0.3884064
+----------------------------------------
+Execution time: 0.20789861679077148
