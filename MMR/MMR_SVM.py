@@ -13,10 +13,10 @@ def sentence_sim(sentence1, sentence2, idf, doc):
     denominator = 0
 
     for word in sentence2["value"].split(" "):
-        numerator += (text_utils.get_word_freq(word, doc[sentence1["doc"]]) * idf[word]) ** 2
+        numerator += text_utils.get_word_freq(word, doc[sentence1["doc"]]) * text_utils.get_word_freq(word, doc[sentence2["doc"]]) * idf[word]**2
 
     for word in sentence1["value"].split(" "):
-        denominator += text_utils.get_word_freq(word, doc[sentence1["doc"]]) * text_utils.get_word_freq(word, doc[sentence2["doc"]]) * idf[word]**2
+        denominator += (text_utils.get_word_freq(word, doc[sentence1["doc"]]) * idf[word]) ** 2
 
     try:
         return numerator / math.sqrt(denominator)
