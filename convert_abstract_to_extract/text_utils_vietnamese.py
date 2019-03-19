@@ -5,7 +5,7 @@ import re
 SPECICAL_CHARACTER = {'(', ')', '[', ']', '”', '“', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'}
 QUOTE = {'(', ')', '[', ']', '”', '“', '*'}
 
-def text_process(sentences):
+def text_process_vietnamese(sentences):
     new_sentences = []
 
     for item in sentences:
@@ -28,7 +28,7 @@ def split_sentences(file_name):
 
         sentence_token = nltk.data.load('tokenizers/punkt/english.pickle')
         tmp = sentence_token.tokenize(text_system)
-        preprocess_sents = text_process(tmp)
+        preprocess_sents = text_process_vietnamese(tmp)
         sentences = []
         for item in preprocess_sents:
             if "…" in item:
@@ -80,7 +80,7 @@ def get_all_sentences(file_system, file_reference):
     sentences_reference = []
     for item in file_reference:
         with open(item, 'r') as file:
-            sentences_ref = text_process(nltk.sent_tokenize(file.read()))
+            sentences_ref = text_process_vietnamese(nltk.sent_tokenize(file.read()))
             sentences_reference.append('. '.join(sentences_ref))
 
     return sentences_origin_system, sentences_reference

@@ -1,5 +1,5 @@
 from rouge_vn import pyrouge_vn
-from convert_to_extract import text_utils
+from convert_to_extract import text_utils_vietnamese
 import os
 import shutil
 import re
@@ -13,7 +13,7 @@ class ConvertExtract(object):
 
     def convert_extract(self, list_documents, list_human, path_save):
         sentences_system, sentences_reference = \
-            text_utils.get_all_sentences(list_documents, list_human)
+            text_utils_vietnamese.get_all_sentences(list_documents, list_human)
 
         old_rouge = 0
         rouge = 0  # initial rouge score

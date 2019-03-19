@@ -1,10 +1,10 @@
 from rouge_vn import pyrouge_vn
-from convert_to_extract import text_utils
+from convert_to_extract import text_utils_english
 import os
 import shutil
 import re
 
-DIR_PATH = '/home/hieupd/PycharmProjects/convert_to_extract'
+DIR_PATH = '/home/hieupd/PycharmProjects/convert_to_extract/english'
 
 
 class ConvertExtract(object):
@@ -13,7 +13,7 @@ class ConvertExtract(object):
 
     def convert_extract(self, list_documents, list_human, path_save):
         sentences_system, docs_reference = \
-            text_utils.get_all_sentences(list_documents, list_human)
+            text_utils_english.get_all_sentences(list_documents, list_human)
 
         old_rouge = 0
         rouge = 0  # initial rouge score
@@ -91,16 +91,6 @@ if __name__ == "__main__":
     list_human_refs = []
     for clus in os.listdir(DIR_PATH + '/Human'):
         list_human_refs.append(DIR_PATH + '/Human/' + clus)
-
-    # regex_string = r"\w+\.ref\d\.txt$"
-    #
-    # path =  '/home/hieupd/Documents/multi_summarization/assignment_3/Data/Data_200_Cluster_VN_Raw'
-    # for dir in os.listdir(path):
-    #     os.mkdir(DIR_PATH + '/Human/' + dir)
-    #     for file in os.listdir(path +  '/' + dir):
-    #
-    #         if re.match(regex_string, file):
-    #             shutil.move( path +  '/' + dir + '/' + file, DIR_PATH + '/Human/' + dir)
 
     for i in range(len(list_clusters)):
         list_docs_in_clus = []
