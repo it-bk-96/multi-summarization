@@ -1,6 +1,6 @@
 import re
 import nltk
-import os
+# import os
 
 
 def processFile(file_name):
@@ -40,34 +40,38 @@ def processFile(file_name):
 
     text_1 = re.sub(" +", " ", text_1)
 
-    # segment data into a list of sentences // tách câu
+
+    # segment data into a list of sentences //  tách câu
     lines = sentence_token.tokenize(text_1.strip())
 
     document = " ".join(lines)
 
     return document
 
+#
+# if __name__ == '__main__':
+#
+#     # set the main Document folder path where the subfolders are present
+#     # main_folder_path = os.getcwd() + "/DUC_2004/Documents"
+#     main_folder_path = os.getcwd() + "/Data/DUC_2007/Documents"
+#
+#     # read in all the subfolder names present in the main folder
+#     for folder in os.listdir(main_folder_path):
+#
+#         print("Running MMR Summarizer for files in folder: ", folder)
+#         # for each folder run the MMR summarizer and generate the final summary
+#         curr_folder = main_folder_path + "/" + folder
+#         path = os.getcwd() + "/Data/DUC_2007/Documents_New/" + folder
+#         os.mkdir(path)
+#
+#         # find all files in the sub folder selected
+#         files = os.listdir(curr_folder)
+#         for file in files:
+#             document = processFile(curr_folder + "/" + file)
+#             results_folder = path + "/"
+#             # print(os.path.join(results_folder, (str(file))))
+#             with open(os.path.join(results_folder, (str(file))), "w") as fileOut:
+#                 fileOut.write(document)
 
-if __name__ == '__main__':
-
-    # set the main Document folder path where the subfolders are present
-    # main_folder_path = os.getcwd() + "/Data_DUC_2004/Documents"
-    main_folder_path = os.getcwd() + "/Data/Data_DUC_2007/Documents"
-
-    # read in all the subfolder names present in the main folder
-    for folder in os.listdir(main_folder_path):
-
-        print("Running MMR Summarizer for files in folder: ", folder)
-        # for each folder run the MMR summarizer and generate the final summary
-        curr_folder = main_folder_path + "/" + folder
-        path = os.getcwd() + "/Data/Data_DUC_2007/Documents_New/" + folder
-        os.mkdir(path)
-
-        # find all files in the sub folder selected
-        files = os.listdir(curr_folder)
-        for file in files:
-            document = processFile(curr_folder + "/" + file)
-            results_folder = path + "/"
-            # print(os.path.join(results_folder, (str(file))))
-            with open(os.path.join(results_folder, (str(file))), "w") as fileOut:
-                fileOut.write(document)
+print([1,2, 3 ,4 ][:2])
+print([1,2, 3 ,4 ][2:])
