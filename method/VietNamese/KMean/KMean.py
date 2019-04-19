@@ -91,7 +91,7 @@ def processFile(file_name):
                                   stemmedSent))
 
         if ((i + 1) == len(lines)) and (len(stemmedSent) <= 8):
-            break
+            continue
         # list of sentence objects
         if stemmedSent:
             sentences.append(sentence(file_name, stemmedSent, originalWords, float(1 / (i + 1))))
@@ -348,13 +348,13 @@ def makeSummaryPageRank(sentences, k_cluster, summary_length, IDF):
 
     summary = []
     top_index = [i for i, j in sorted(enumerate(node_weights), key=lambda x: x[1], reverse=True)]
+    i = 0
     current_length = 0
+    while (current_length < (summary_length - 20)):
+        summary += [k_mean_sentences[top_index[i]]]
+        current_length += len(ViTokenizer.tokenize(k_mean_sentences[top_index[i]].getOriginalWords()).split())
+        i += 1
 
-    for i in top_index:
-        if (current_length > (summary_length - 20)):
-            break
-        summary += [k_mean_sentences[i]]
-        current_length += len(ViTokenizer.tokenize(sentences[i].getOriginalWords()).split())
     print(current_length, summary_length)
     global human_nu, system_nu
     human_nu += summary_length
@@ -393,7 +393,7 @@ def makeSummaryPosition(sentences, k_cluster, summary_length, IDF):
     sum_len = 0
 
     # keeping adding sentences until number of words exceeds summary length
-    while (sum_len <= (summary_length - 25)):
+    while sum_len < (summary_length - 20):
         maxxer = max(k_mean_sentences, key=lambda item: item.getWeightedPosition())
         summary.append(maxxer)
         k_mean_sentences.remove(maxxer)
@@ -435,7 +435,7 @@ def makeSummaryPositionMMR(sentences, query, k_cluster, summary_length, lambta, 
     position = [sen.getWeightedPosition() for sen in k_mean_sentences]
 
     # keeping adding sentences until number of words exceeds summary length
-    while (sum_len <= (summary_length - 25)) and k_mean_sentences:
+    while (sum_len < (summary_length - 20)) and k_mean_sentences:
         max_value = max(position)
         print(max_value, position.count(max_value))
         if position.count(max_value) == 1:
@@ -447,7 +447,6 @@ def makeSummaryPositionMMR(sentences, query, k_cluster, summary_length, lambta, 
         else:
             MMRval = {}
             list_p = []
-            print('vao dc nay')
             for i in range(len(position)):
                 if position[i] == max_value:
                     list_p.append(i)
@@ -613,15 +612,12 @@ if __name__ == '__main__':
         files = os.listdir(curr_folder)
 
         file_human_1 = human_folder_path + folder + ".ref1.txt"
-        text_1_token = open(file_human_1, 'r').read()
-        text_1_token = text_1_token.strip().lower()
-        text_1_token = ViTokenizer.tokenize(text_1_token).split()
-
         file_human_2 = human_folder_path + folder + ".ref2.txt"
-        text_2_token = open(file_human_2, 'r').read()
-        text_2_token = text_2_token.strip().lower()
-        text_2_token = ViTokenizer.tokenize(text_2_token).split()
-        length_summary = (len(text_1_token) + len(text_2_token)) // 2
+        text_1 = open(file_human_1, 'r').read()
+        text_2 = open(file_human_2, 'r').read()
+        text_1_token = ViTokenizer.tokenize(text_1)
+        text_2_token = ViTokenizer.tokenize(text_2)
+        length_summary = (len(text_1_token.split()) + len(text_2_token.split())) / 2
 
         sentences = []
 
@@ -638,8 +634,8 @@ if __name__ == '__main__':
         query = buildQuery(sentences, TF_IDF_w, 10)
 
         # build summary by adding more relevant sentences
-        summary = makeSummaryPageRank(sentences, k_cluster, length_summary, IDF_w)
-        # summary = makeSummaryPosition(sentences, k_cluster, length_summary, IDF_w)
+        # summary = makeSummaryPageRank(sentences, k_cluster, length_summary, IDF_w)
+        summary = makeSummaryPosition(sentences, k_cluster, length_summary, IDF_w)
         # summary = makeSummaryPositionMMR(sentences, query, k_cluster, length_summary, 0.5, IDF_w)
         # summary = makeSummaryMMRW2V(sentences, query, k_cluster, length_summary, 0.5, IDF_w)
         # summary = makeSummaryMMR(sentences, query, k_cluster, length_summary, 0.5, IDF_w)
@@ -650,8 +646,8 @@ if __name__ == '__main__':
         final_summary = final_summary[:-1]
         # results_folder = root_directory + "Data/VietNamese/K_mean_results"
         # results_folder = root_directory + "Data/VietNamese/K_mean_results_W2V"
-        # results_folder = root_directory + "Data/VietNamese/K_mean_results_Position"
-        results_folder = root_directory + "Data/VietNamese/K_mean_results_PageRank"
+        results_folder = root_directory + "Data/VietNamese/K_mean_results_Position"
+        # results_folder = root_directory + "Data/VietNamese/K_mean_results_PageRank"
         # results_folder = root_directory + "Data/VietNamese/K_mean_results_Position_MMR"
         with open(os.path.join(results_folder, (str(folder) + ".kmean")), "w") as fileOut:
             fileOut.write(final_summary)

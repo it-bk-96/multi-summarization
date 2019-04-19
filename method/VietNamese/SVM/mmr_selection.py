@@ -1,6 +1,7 @@
 import math
 from method.VietNamese.SVM.Utils import text_utils
 
+sys_term = hu_term = 0
 
 # doc = {0: "Cao Mạnh Hải và Vũ Trường Giang ở Phú Thọ", 1: "Anh Duy Hiếu ở Thái Bình", 2: "doc3"}
 # sent_orign = [{"doc": 0, "value": "Hải Phú Thọ", "score_svm": 0.92},
@@ -54,14 +55,14 @@ def MMRScore(Si, summari, lambta, idf, doc):
     return MMR_SCORE
 
 
-def make_summary(sentences, summary_length, lambta, IDF, doc):
+def make_summary(sentences, n, lambta, IDF, doc):
     summary = [sentences[0]]
     del sentences[0]
-    sum_len = len(sentences[0]["value"].split(' '))
+    current_len = len(sentences[0]["value"].split(' '))
 
     # keeping adding sentences until number of words exceeds summary length
     # print ('------------------------------')
-    while (sum_len < summary_length - 5):
+    while (current_len < (n - 20)):
 
         index = -1
         max_score_mmr = -1
@@ -79,12 +80,10 @@ def make_summary(sentences, summary_length, lambta, IDF, doc):
         # print (sentences)
         if len(sentences) == 0:
             break
-        sum_len += len(sent_selected['value'].split(' '))
-
+        current_len += len(sent_selected['value'].split(' '))
+    print(current_len, n)
+    global sys_term, hu_term
+    sys_term += current_len
+    hu_term += n
 
     return summary
-
-# if __name__ == "__main__":
-#     a = make_summary(sent_orign, 20, 0.6, idf, doc)
-#
-#     print (a)

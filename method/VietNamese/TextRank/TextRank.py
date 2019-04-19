@@ -105,7 +105,7 @@ class Preprocessing(object):
                                      and x != '_' and x != '--' and x != "(" and x != ")" and x != ";" and x not in stop_word,
                            stemmed_sentence))
                 if ((i + 1) == len(lines)) and (len(stemmed_sentence) <= 8):
-                    break
+                    continue
                 if stemmed_sentence:
                     sentences.append(sentence(stemmed_sentence, OG_sent))
 

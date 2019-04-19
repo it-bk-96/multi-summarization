@@ -35,7 +35,7 @@ def processFile(file_name):
                                             and x != '_' and x != '--' and x != "(" and x != ")" and x != ";" and x not in stop_word,
                                   stemmedSent))
         if ((i + 1) == len(lines)) and (len(stemmedSent) <= 8):
-            break
+            continue
         # list of sentence objects
         if stemmedSent:
             sentences.append(sentence.sentence(file_name, stemmedSent, originalWords))

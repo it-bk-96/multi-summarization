@@ -96,7 +96,7 @@ def processFile(file_name):
                                             and x != "''" and x != "'s", stemmedSent))
 
         if (len(stemmedSent) <= 4):
-            break
+            continue
         # list of sentence objects
         if stemmedSent:
             sentences.append(sentence.sentence(file_name, stemmedSent, originalWords))
@@ -347,28 +347,6 @@ if __name__ == '__main__':
         # find all files in the sub folder selected
         files = os.listdir(curr_folder)
 
-        file_human_1 = human_folder_path  + "summary_" + folder[3:5] + ".A.1.txt"
-        file_human_2 = human_folder_path  + "summary_" + folder[3:5] + ".B.1.txt"
-        file_human_3 = human_folder_path  + "summary_" + folder[3:5] + ".C.1.txt"
-        file_human_4 = human_folder_path  + "summary_" + folder[3:5] + ".D.1.txt"
-        text_1 = open(file_human_1, 'r').read()
-        text_2 = open(file_human_2, 'r').read()
-        text_3 = open(file_human_3, 'r').read()
-        text_4 = open(file_human_4, 'r').read()
-        length_summary = 0
-        for el in [text_1, text_2, text_3, text_4]:
-            llll = nltk.word_tokenize(el)
-
-            # stemming words // đưa về từ gốc
-            stemmedSent = [porter.stem(word) for word in llll]
-            stemmedSent = list(filter(lambda x: x != '.' and x != '`' and x != ',' and x != '_' and x != ';'
-                                                and x != '(' and x != ')' and x.find('&') == -1
-                                                and x != '?' and x != "'" and x != '!' and x != '''"'''
-                                                and x != '``' and x != '--' and x != ':'
-                                                and x != "''" and x != "'s", stemmedSent))
-            length_summary += len(stemmedSent)
-        length_summary = length_summary / 4
-
         sentences = []
         for file in files:
             sentences = sentences + processFile(curr_folder + "/" + file)
@@ -386,7 +364,7 @@ if __name__ == '__main__':
         best1sentence = bestSentence(sentences, query, IDF_w)
 
         # build summary by adding more relevant sentences
-        summary = makeSummary(sentences, best1sentence, query, length_summary, 0.5, IDF_w)
+        summary = makeSummary(sentences, best1sentence, query, 250, 0.5, IDF_w)
 
         final_summary = ""
         for sent in summary:

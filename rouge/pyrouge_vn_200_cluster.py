@@ -2,7 +2,7 @@ from __future__ import division
 import collections
 import os
 import six
-import time
+from definitions import ROOT_DIR
 from pyvi import ViTokenizer
 
 
@@ -136,14 +136,15 @@ def rouge_l(peer, models, alpha):
     return _safe_f1(matches, recall_total, precision_total, alpha)
 
 
-root_directory = "/home/giangvu/Desktop/multi-summarization/"
+root_directory = ROOT_DIR + "/"
 if __name__ == "__main__":
 
     # system_path = root_directory + "Data/VietNamese/LexRank_results/"
-    system_path = root_directory + "Data/VietNamese/NMF_results/"
+    # system_path = root_directory + "Data/VietNamese/NMF_results/"
     # system_path = root_directory + "Data/VietNamese/TextRank_results/"
     # system_path = root_directory + "Data/VietNamese/MMR_results/"
-    # system_path = root_directory + "Data/VietNamese/K_mean_results_Position/"
+    # system_path = root_directory + "Data/VietNamese/SVM_results/"
+    system_path = root_directory + "Data/VietNamese/K_mean_results_Position/"
     # system_path = root_directory + "Data/VietNamese/K_mean_results_Position_MMR/"
     # system_path = root_directory + "Data/VietNamese/K_mean_results_PageRank/"
     human_path = root_directory + "Data/VietNamese/Human_Summaries/"
@@ -153,27 +154,28 @@ if __name__ == "__main__":
     arr_rouge_recall = []
     arr_rouge_f1 = []
     for file in os.listdir(system_path):
-        id = file.split("_")[1].split(".")[0]
+        id = str(file.split("_")[1]).split(".")[0]
         file_name_system = system_path + file
         text_system = open(file_name_system, 'r').read()
-        text_system = text_system.strip().lower().replace("\n", "")
-        text_system = ViTokenizer.tokenize(text_system).split()
+        text_system = ViTokenizer.tokenize(text_system)
+        text_system = text_system.strip().lower().replace("\n", "").split()
         text_system = list(filter(lambda x: x != '.' and x != '`' and x != ',' and x != '?' and x != "'" and x != ":"
                                              and x != '!' and x != '''"''' and x != "''" and x != '-',
                                    text_system))
 
+
         file_name_human_1 = human_path + "cluster_" + id + ".ref1.txt"
         text_human_1 = open(file_name_human_1, 'r').read()
-        text_human_1 = text_human_1.strip().lower().replace("\n", "")
-        text_human_1 = ViTokenizer.tokenize(text_human_1).split()
+        text_human_1 = ViTokenizer.tokenize(text_human_1)
+        text_human_1 = text_human_1.strip().lower().replace("\n", "").split()
         text_human_1 = list(filter(lambda x: x != '.' and x != '`' and x != ',' and x != '?' and x != "'" and x != ":"
                                             and x != '!' and x != '''"''' and x != "''" and x != '-',
                                   text_human_1))
 
         file_name_human_2 = human_path + "cluster_" + id + ".ref2.txt"
         text_human_2 = open(file_name_human_2, 'r').read()
-        text_human_2 = text_human_2.strip().lower().replace("\n", "")
-        text_human_2 = ViTokenizer.tokenize(text_human_2).split()
+        text_human_2 = ViTokenizer.tokenize(text_human_2)
+        text_human_2 = text_human_2.strip().lower().replace("\n", "").split()
         text_human_2 = list(filter(lambda x: x != '.' and x != '`' and x != ',' and x != '?' and x != "'" and x != ":"
                                             and x != '!' and x != '''"''' and x != "''" and x != '-',
                                   text_human_2))

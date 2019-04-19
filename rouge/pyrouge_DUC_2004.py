@@ -22,7 +22,7 @@ if __name__ == "__main__":
 
     print ("-----------------MMR DUC 2004--------------------------")
 
-    rouge_output = rouge.convert_and_evaluate()
+    rouge_output = rouge.evaluate()
     print(rouge_output)
 
     # output_dict = rouge.output_to_dict(rouge_output)

@@ -1,0 +1,5 @@
+Yahoo cũng đã từng áp dụng HTTPS cho dịch vụ của mình hồi đầu năm, tuy nhiên đây chỉ là một tùy chọn chứ không phải là giao thức mặc định.
+Nếu bạn sử dụng các ứng dụng Yahoo Mail trên điện thoại và tablet thì chúng vẫn chưa hỗ trợ HTTPS.
+Việc Yahoo Mail áp dụng giao thức SSL được xem là khá muộn, khi mà các hãng công nghệ khác đã dùng giao thức này từ khá lâu.
+Được biết, SSL là một tiêu chuẩn an ninh công nghệ toàn cầu tạo ra một liên kết được mã hóa giữa máy chủ web và trình duyệt.
+Đối thủ của Yahoo Mail - Gmail của Google - đã áp dụng giao thức HTTPS này từ năm 2008, và công nghệ này được mặc định trên Gmail từ tháng Một năm 2010; còn các chuyên gia bảo mật đã từng nhiều lần khuyến cáo rằng giao thức http không đủ an toàn.

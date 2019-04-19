@@ -1,4 +1,5 @@
 import os
+import shutil
 from definitions import ROOT_DIR
 from method.VietNamese.SVM.Utils import text_utils
 # from method.VietNamese.SVM.Scores import nmf_summarizer
@@ -16,7 +17,7 @@ class FeatureSvm(object):
         self.stop_words = text_utils.read_stopwords(file_stopwords)
 
     def get_sentences(self):
-        sentences = text_utils.split_sentences(self.file_name)
+        sentences = text_utils.split_sent_json(self.file_name)
         return text_utils.text_process(sentences, self.stop_words)
 
     # 1/Position
@@ -115,16 +116,13 @@ if __name__ == "__main__":
     path_stopword = ROOT_DIR + '/vietnamese-stopwords.txt'
     stop_words = text_utils.read_stopwords(path_stopword)
 
-    root = ROOT_DIR + "/method/VietNamese/SVM/Data/data_labels"
+    root = ROOT_DIR + "/method/VietNamese/SVM/Data/converted"
 
     # compute idf
     list_document_paths = []
 
     i = 0
     for clus in os.listdir(root + '/train'):
-        # i += 1
-        # if i > 20:
-        #     break
         path_clus = root + '/train/' + clus
         for filename in os.listdir(path_clus):
             list_document_paths.append(path_clus + '/' + filename)
@@ -133,28 +131,29 @@ if __name__ == "__main__":
     # read all doc and preprocess data
     documents = text_utils.read_all_documents(list_document_paths, stop_words)
 
-    # bag = []
-    # for i in documents:
-    #     bag += i.split(' ')
-
-    bi_documents = text_utils.convert_uni_to_bi(documents)
-    all_idf = text_utils.get_all_idf(documents)
-    text_utils.save_idf(all_idf, 'all_idf.json')
-
-    bi_all_idf = text_utils.get_all_idf(bi_documents)
-    text_utils.save_idf(bi_all_idf, 'all_bi_idf.json')
-    # all_idf = text_utils.read_json_file('all_idf.json')
-    # bi_all_idf = text_utils.read_json_file('all_bi_idf.json')
+    # bi_documents = text_utils.convert_uni_to_bi(documents)
+    # all_idf = text_utils.get_all_idf(documents)
+    # text_utils.save_idf(all_idf, 'all_idf.json')
+    #
+    # bi_all_idf = text_utils.get_all_idf(bi_documents)
+    # text_utils.save_idf(bi_all_idf, 'all_bi_idf.json')
+    all_idf = text_utils.read_json_file('all_idf.json')
+    bi_all_idf = text_utils.read_json_file('all_bi_idf.json')
 
 
     a = 0
 
+    # remove all file in svm_features/train or test
+    shutil.rmtree(SVM_FEATURES + '/test')
+    os.mkdir(SVM_FEATURES + '/test')
+
+    shutil.rmtree(SVM_FEATURES + '/train')
+    os.mkdir(SVM_FEATURES + '/train')
+
+
     for dir in os.listdir(root):
         path_dir = root + '/' + dir
         for clus in os.listdir(path_dir):
-            # a += 1
-            # if a > 20:
-            #     break
             print(clus)
             path_clus = path_dir + '/' + clus
             sents_of_clus = []

@@ -1,9 +1,12 @@
 from __future__ import print_function
+
+import math
 import os
 import re
-import math
+import time
 import nltk
 import numpy as np
+
 porter = nltk.PorterStemmer()
 from sklearn.cluster import KMeans
 from sklearn.metrics import pairwise_distances_argmin_min
@@ -56,7 +59,6 @@ class sentence(object):
 
 
 def processFile(file_path_and_name):
-
     try:
         f = open(file_path_and_name, 'r')
         text_0 = f.read()
@@ -101,13 +103,13 @@ def processFile(file_path_and_name):
 
             stemmed_sentence = [porter.stem(word) for word in line]
             stemmed_sentence = list(filter(lambda x: x != '.' and x != '`' and x != ',' and x != '_' and x != ';'
-                                                and x != '(' and x != ')' and x.find('&') == -1
-                                                and x != '?' and x != "'" and x != '!' and x != '''"'''
-                                                and x != '``' and x != '--' and x != ':'
-                                                and x != "''" and x != "'s", stemmed_sentence))
+                                                     and x != '(' and x != ')' and x.find('&') == -1
+                                                     and x != '?' and x != "'" and x != '!' and x != '''"'''
+                                                     and x != '``' and x != '--' and x != ':'
+                                                     and x != "''" and x != "'s", stemmed_sentence))
 
             if (len(stemmed_sentence) <= 4):
-                break
+                continue
             if stemmed_sentence:
                 if i == (len(lines) - 1):
                     weight_position = float(1.0)
@@ -313,7 +315,6 @@ def MMRScore(Si, query, Sj, lambta, IDF):
 
 
 def sim_cosin(sentence1, sentence2):
-
     numerator = 0
     denom1 = 0
     denom2 = 0
@@ -333,6 +334,7 @@ def sim_cosin(sentence1, sentence2):
     except ZeroDivisionError:
         return float("-inf")
 
+
 def PageRank(graph, node_weights, d=.85, iter=20):
     weight_sum = np.sum(graph, axis=0)
     while iter > 0:
@@ -342,6 +344,7 @@ def PageRank(graph, node_weights, d=.85, iter=20):
                 temp += graph[i, j] * node_weights[j] / weight_sum[j]
             node_weights[i] = 1 - d + (d * temp)
         iter -= 1
+
 
 def makeSummaryPageRankPMMR(sentences, query, k_cluster, summary_length, lambta, IDF):
     # k mean
@@ -367,8 +370,20 @@ def makeSummaryPageRankPMMR(sentences, query, k_cluster, summary_length, lambta,
     closest, _ = pairwise_distances_argmin_min(kmeans.cluster_centers_, A)
     ordering = sorted(range(k_cluster), key=lambda k: avg[k])
 
-    k_mean_sentences = [sentences[closest[idx]] for idx in ordering]
-    vector_clusters = kmeans.cluster_centers_
+    temp_k_mean_sentences = [sentences[closest[idx]] for idx in ordering]
+    temp_vector_clusters = kmeans.cluster_centers_
+
+    k_mean_sentences = []
+    vector_clusters = []
+    for i in range(len(temp_k_mean_sentences)):
+        flag = True
+        for sent_xxxx in k_mean_sentences:
+            if temp_k_mean_sentences[i].getPreProWords() == sent_xxxx.getPreProWords():
+                flag = False
+                break
+        if flag:
+            k_mean_sentences.append(temp_k_mean_sentences[i])
+            vector_clusters.append(temp_vector_clusters[i])
 
     num_nodes = len(vector_clusters)
     graph = np.zeros((num_nodes, num_nodes))
@@ -390,58 +405,20 @@ def makeSummaryPageRankPMMR(sentences, query, k_cluster, summary_length, lambta,
             index_max_between = i
             max_between = current
     print(index_max_between, max_between)
-    top_k_sentence_best = k_mean_sentences[: index_max_between+1]
-    else_k_mean_sentences = k_mean_sentences[index_max_between + 1:]
-    position_top_k_sentence_best = sorted(top_k_sentence_best, key=lambda x: x.getWeightedPosition(), reverse=True)
+    top_k_sentence_best = k_mean_sentences[: index_max_between + 1]
     summary = []
     sum_len = 0
     j = 0
-    while sum_len < summary_length:
-        if len(position_top_k_sentence_best) == 0:
-            summary.append(else_k_mean_sentences[j])
-            sum_len += len(else_k_mean_sentences[j].getPreProWords())
-            j += 1
-        elif len(position_top_k_sentence_best) > 1:
-            maxxer_all = []
-            while True:
-                if len(position_top_k_sentence_best) == 1:
-                    maxxer_all.append(position_top_k_sentence_best[0])
-                    break
-                between_aaaa = position_top_k_sentence_best[0].getWeightedPosition() - position_top_k_sentence_best[1].getWeightedPosition()
-                if between_aaaa == 0:
-                    maxxer_all.append(position_top_k_sentence_best[0])
-                    position_top_k_sentence_best.pop(0)
-                else:
-                    maxxer_all.append(position_top_k_sentence_best[0])
-                    break
 
-            if len(maxxer_all) == 1:
-                summary.append(position_top_k_sentence_best[0])
-                sum_len += len(position_top_k_sentence_best[0].getPreProWords())
-                position_top_k_sentence_best.pop(0)
-            else:
-                while maxxer_all and (sum_len < summary_length):
-                    MMRval = {}
-                    for sent in maxxer_all:
-                        MMRval[sent] = MMRScore(sent, query, summary, lambta, IDF)
-                    maxxer = max(MMRval, key=MMRval.get)
-                    summary.append(maxxer)
-                    maxxer_all.remove(maxxer)
-                    sum_len += len(maxxer.getPreProWords())
-                    summary.append(maxxer)
-                position_top_k_sentence_best.pop(0)
-        else:
-            summary.append(position_top_k_sentence_best[0])
-            sum_len += len(position_top_k_sentence_best[0].getPreProWords())
-            position_top_k_sentence_best.pop(0)
 
     global system_nu, human_nu
     system_nu += sum_len
     human_nu += summary_length
-
+    print(sum_len)
     return summary
 
-def makeSummaryPageRank(sentences, query, k_cluster, summary_length, lambta, IDF):
+
+def makeSummaryPageRank(sentences, query, k_cluster, n, lambta, IDF):
     # k mean
     # create vocabulary
     vocabulary = []
@@ -474,6 +451,9 @@ def makeSummaryPageRank(sentences, query, k_cluster, summary_length, lambta, IDF
         for j in range(i + 1, num_nodes):  # tinh toan độ trùng lặp giữa 2 sentences
             graph[i, j] = float(sim_cosin(vector_clusters[i], vector_clusters[j]))
             graph[j, i] = graph[i, j]
+            # graph[i, j] = float(len(set(k_mean_sentences[i].getPreProWords()) & set(k_mean_sentences[j].getPreProWords()))) / (
+            #         len(k_mean_sentences[i].getPreProWords()) + len(k_mean_sentences[j].getPreProWords()))
+            # graph[j, i] = graph[i, j]
 
     node_weights = np.ones(num_nodes)
     PageRank(graph, node_weights)
@@ -487,8 +467,13 @@ def makeSummaryPageRank(sentences, query, k_cluster, summary_length, lambta, IDF
     for i in top_index:
         if (sum_len > n):
             break
-        summary += [k_mean_sentences[i]]
-        sum_len += len(k_mean_sentences[i].getPreProWords())
+        flag = True
+        for sen_sum in summary:
+            if k_mean_sentences[i].getPreProWords() == sen_sum.getPreProWords():
+                flag = False
+        if flag:
+            summary += [k_mean_sentences[i]]
+            sum_len += len(k_mean_sentences[i].getPreProWords())
 
     global human_nu, system_nu
     human_nu += n
@@ -496,6 +481,7 @@ def makeSummaryPageRank(sentences, query, k_cluster, summary_length, lambta, IDF
     print(sum_len, n)
 
     return summary
+
 
 def makeSummaryMMR(sentences, query, k_cluster, summary_length, lambta, IDF):
     # k mean
@@ -529,7 +515,7 @@ def makeSummaryMMR(sentences, query, k_cluster, summary_length, lambta, IDF):
     sum_len = len(best_sentence.getPreProWords())
 
     # keeping adding sentences until number of words exceeds summary length
-    while (sum_len <= summary_length) and k_mean_sentences:
+    while (sum_len < summary_length):
         MMRval = {}
 
         for sent in k_mean_sentences:
@@ -570,20 +556,33 @@ def makeSummaryPositionMMR(sentences, query, k_cluster, n, lambta, IDF):
     closest, _ = pairwise_distances_argmin_min(kmeans.cluster_centers_, A)
     ordering = sorted(range(k_cluster), key=lambda k: avg[k])
 
-    k_mean_sentences = [sentences[closest[idx]] for idx in ordering]
+    temp_k_mean_sentences = [sentences[closest[idx]] for idx in ordering]
+    temp_vector_clusters = kmeans.cluster_centers_
+
+    k_mean_sentences = []
+    vector_clusters = []
+    for i in range(len(temp_k_mean_sentences)):
+        flag = True
+        for sent_xxxx in k_mean_sentences:
+            if temp_k_mean_sentences[i].getPreProWords() == sent_xxxx.getPreProWords():
+                flag = False
+                break
+        if flag:
+            k_mean_sentences.append(temp_k_mean_sentences[i])
+            vector_clusters.append(temp_vector_clusters[i])
     position = [sen.getWeightedPosition() for sen in k_mean_sentences]
     summary = []
     sum_len = 0
 
     # keeping adding sentences until number of words exceeds summary length
-    while (sum_len < n) and k_mean_sentences:
+    while sum_len < n and k_mean_sentences:
         max_value = max(position)
         if position.count(max_value) == 1:
             maxxer = max(k_mean_sentences, key=lambda item: item.getWeightedPosition())
             summary.append(maxxer)
+            sum_len += len(maxxer.getPreProWords())
             k_mean_sentences.remove(maxxer)
             position = [sen.getWeightedPosition() for sen in k_mean_sentences]
-            sum_len += len(maxxer.getPreProWords())
         else:
             MMRval = {}
             list_p = []
@@ -591,9 +590,9 @@ def makeSummaryPositionMMR(sentences, query, k_cluster, n, lambta, IDF):
                 if position[i] == max_value:
                     list_p.append(i)
             for i in list_p:
-                MMRval[i] = MMRScore(k_mean_sentences[i], query, summary, lambta, IDF)
-            last_p = max(MMRval, key=MMRval.get)
-            maxxer = k_mean_sentences[last_p]
+                MMRval[k_mean_sentences[i]] = MMRScore(k_mean_sentences[i], query, summary, lambta, IDF)
+
+            maxxer = max(MMRval, key=MMRval.get)
             summary.append(maxxer)
             k_mean_sentences.remove(maxxer)
             position = [sen.getWeightedPosition() for sen in k_mean_sentences]
@@ -602,6 +601,7 @@ def makeSummaryPositionMMR(sentences, query, k_cluster, n, lambta, IDF):
     global human_nu, system_nu
     human_nu += n
     system_nu += sum_len
+    print(sum_len)
     return summary
 
 
@@ -624,59 +624,36 @@ if __name__ == '__main__':
 
     # set the main Document folder path where the subfolders are present
     main_folder_path = root_directory + "Data/DUC_2007/Documents"
-    human_folder_path = root_directory + "Data/DUC_2007/Human_Summaries/"
 
     # read in all the subfolder names present in the main folder
     for folder in os.listdir(main_folder_path):
-
         print("Running Kmean Summarizer for files in folder: ", folder)
         # for each folder run the MMR summarizer and generate the final summary
         curr_folder = main_folder_path + "/" + folder
-
-        file_human_1 = human_folder_path + "summary_" + folder[3:5] + ".A.1.txt"
-        file_human_2 = human_folder_path + "summary_" + folder[3:5] + ".B.1.txt"
-        file_human_3 = human_folder_path + "summary_" + folder[3:5] + ".C.1.txt"
-        file_human_4 = human_folder_path + "summary_" + folder[3:5] + ".D.1.txt"
-        text_1 = open(file_human_1, 'r').read()
-        text_2 = open(file_human_2, 'r').read()
-        text_3 = open(file_human_3, 'r').read()
-        text_4 = open(file_human_4, 'r').read()
-        n = 0
-        for el in [text_1, text_2, text_3, text_4]:
-            llll = nltk.word_tokenize(el)
-
-            # stemming words // đưa về từ gốc
-            stemmedSent = [porter.stem(word) for word in llll]
-            stemmedSent = list(filter(lambda x: x != '.' and x != '`' and x != ',' and x != '_' and x != ';'
-                                                     and x != '(' and x != ')' and x.find('&') == -1
-                                                     and x != '?' and x != "'" and x != '!' and x != '''"'''
-                                                     and x != '``' and x != '--' and x != ':'
-                                                     and x != "''" and x != "'s", stemmedSent))
-            n += len(stemmedSent)
-        n = n / 4
 
         sentences = []
         files = os.listdir(curr_folder)
         for file in files:
             sentences = sentences + processFile(curr_folder + "/" + file)
-        k_cluster = getK_cluster(sentences, n)
+        k_cluster = getK_cluster(sentences, 250)
         print(k_cluster)
         IDF_w = IDFs(sentences)
         TF_IDF_w = TF_IDF(sentences)
         query = buildQuery(sentences, TF_IDF_w, 10)
 
-        # summary = makeSummaryMMR(sentences, query, k_cluster, n, 0.5, IDF_w)
-        summary = makeSummaryPageRankPMMR(sentences, query, k_cluster, n, 0.5, IDF_w)
-        # summary = makeSummaryPageRank(sentences, query, k_cluster, n, 0.5, IDF_w)
-        # summary = makeSummaryPositionMMR(sentences, query, k_cluster, n, 0.5, IDF_w)
+        # summary = makeSummaryMMR(sentences, query, k_cluster, 250, 0.5, IDF_w)
+        # summary = makeSummaryPageRankPMMR(sentences, query, k_cluster, 250, 0.5, IDF_w)
+        # summary = makeSummaryPageRank(sentences, query, k_cluster, 250, 0.5, IDF_w)
+        summary = makeSummaryPositionMMR(sentences, query, k_cluster, 250, 0.5, IDF_w)
 
         final_summary = ""
         for sent in summary:
             final_summary = final_summary + sent.getOriginalWords() + "\n"
         final_summary = final_summary[:-1]
-        # results_folder = root_directory + "Data/DUC_2007/Kmean_results_position"
-        # results_folder = root_directory + "Data/DUC_2007/Kmean_results_pagerank_position"
-        results_folder = root_directory + "Data/DUC_2007/Kmean_results_pagerank_position_MMR"
+
+        results_folder = root_directory + "Data/DUC_2007/Kmean_results_position"
+        # results_folder = root_directory + "Data/DUC_2007/Kmean_results_pagerank"
+        # results_folder = root_directory + "Data/DUC_2007/Kmean_results_pagerank_position_MMR"
         # results_folder = root_directory + "Data/DUC_2007/Kmean_results"
         with open(os.path.join(results_folder, (str(folder) + ".kmean")), "w") as fileOut:
             fileOut.write(final_summary)

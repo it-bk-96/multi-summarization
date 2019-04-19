@@ -56,6 +56,14 @@ def split_sent_notoken(file_name):
         sentences = file.read().split('\n')
     return sentences
 
+def split_sent_json(file_name):
+    with open(file_name, 'r') as file:
+        sentences = json.load(file)
+    results = []
+    for sent_json in sentences:
+        results.append(sent_json['label'] + ' ' + sent_json['tokenized'])  # remove stopwords
+    return results
+
 
 def split_sentences(file_name):
     sentences = []
@@ -63,18 +71,6 @@ def split_sentences(file_name):
         data = file.read().split('\n')
         for sent in data:
             sentences.append(sent)  # remove stopwords
-
-    # sentence_token = nltk.data.load('tokenizers/punkt/english.pickle')
-    # tmp = sentence_token.tokenize(text_system)
-
-    # sentences = []
-    # for item in tmp:
-    #     if "…" in item:
-    #         b = item.split("…")
-    #         for i in b:
-    #             sentences.append(i)
-    #     else:
-    #         sentences.append(item)
 
     return sentences
 
@@ -146,7 +142,7 @@ def text_process_all(sentences, stop_words):
     new_sentences = []
 
     for item in sentences:
-        tmp = item[2:].lower()  # remove label from data => [2:]
+        tmp = item.lower()
         text_tmp = ""
         for word in tmp.split(' '):
             if (word not in stop_words) and (len(word) != 1 or word in SPECICAL_CHARACTER):
@@ -155,7 +151,6 @@ def text_process_all(sentences, stop_words):
         new_sentences.append(text_tmp[:-1].strip())
 
     return new_sentences
-
 
 def read_stopwords(file_name):
     with open(file_name, 'r') as file:
@@ -208,6 +203,14 @@ def get_dict_words_from_doc(document):
 
 
 def get_word_freq(word, document):
+    dict_words = get_dict_words_from_doc(document)
+
+    if word not in dict_words:
+        return 0
+
+    return dict_words[word]
+
+def get_word_freq_json(word, document):
     dict_words = get_dict_words_from_doc(document)
 
     if word not in dict_words:
@@ -313,9 +316,8 @@ def get_centroid_uni(document, all_idf):
 def read_all_documents(file_names, stop_words):
     documents = []
     for item in file_names:
-        sentences = split_sent_notoken(item)
+        sentences = split_sent_json(item)
         sentences = text_process_all(sentences, stop_words)  # remove stopwords
-
         sentences_not_short = remove_short_sents(sentences)[1]  # remove short sents
         documents.append(get_doc_from_sentences(sentences_not_short))
 
@@ -499,53 +501,3 @@ def convert_features_svm(path):
     Y_test = np.array(Y_test)
 
     return X_train, Y_train, X_test, Y_test
-
-
-# convert_features_svm('/home/hieupd/PycharmProjects/multi_summari_svm_vietnamese/svm_features')
-# if __name__ == "__main__":
-#     sentences = split_sentences("/home/hieupd/PycharmProjects/multi_summari_svm/Data_Non_Token/Documents/cluster_1/12240106.body.txt")
-#     sentences2 = split_sentences("/home/hieupd/PycharmProjects/multi_summari_svm/Data_Non_Token/Documents/cluster_1/12240586.body.txt")
-#     # # print (sentences)
-#     #
-#     # # print (sentences)
-#     #
-#     stop_words = read_stopwords("/home/hieupd/PycharmProjects/multi_summari_svm/stopwords.txt")
-#     # # print (stop_words)
-#     #
-#     sentences = text_process(sentences, stop_words)
-#     print(sentences)
-#     doc = get_doc_from_sentences(sentences)
-#
-#     sentences2 = text_process(sentences2, stop_words)
-#     doc2 = get_doc_from_sentences(sentences2)
-#
-#     # print (tf("Người", doc))
-#     a = get_freq_word_uni(doc)
-#
-#     # print (a)
-#     # a = convert_uni_to_bi([doc])
-#     #
-#     # print (a)
-#
-#     all_idf = get_all_idf([doc, doc2])
-#     print(all_idf)
-#
-#     print(cos_similarity(sentences[1], all_idf, sentences))
-#
-#     # print (all_idf)
-#     #
-#     # a = get_centroid_uni(doc, all_idf)
-#     #
-#     # print (a)
-#     # print (get_all_word([sentences, sentences]))
-#     # for item in sentences:
-#     #     print (item)
-#     # print ("----------------------------------")
-#     # contain = get_sentence_first_paragraph("document1.txt", stop_words)
-#     #
-#     # for item in sentences:
-#     #     if item in contain:
-#     #         print (1)
-#     #     else:
-#     #
-#     #         print (0)

@@ -1,0 +1,88 @@
+import re
+import nltk
+from pyvi import ViTokenizer
+
+SPECICAL_CHARACTER = {'(', ')', '[', ']', ',', '"', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'}
+
+
+def text_process_vietnamese(sentences):
+    new_sentences = []
+    original_sent = []
+
+    for item in sentences:
+        tmp = re.sub('[<>@~:.;]', '', item)
+        tmp = re.sub('-', ' ', tmp)
+        tmp = re.sub('[“”]', '"', tmp)
+        text_tmp = []
+        token_sent = ViTokenizer.tokenize(tmp).lower()
+
+        for word in token_sent.split(' '):
+            if len(word) != 1 or word in SPECICAL_CHARACTER:
+                text_tmp.append(word)
+
+        if len(text_tmp) > 5:
+            new_sentences.append(' '.join(text_tmp).strip())
+            original_sent.append(tmp)
+
+    return new_sentences, original_sent
+
+
+def split_sentences(file_name):
+    try:
+        with open(file_name, 'r') as file:
+            text_system = file.read().strip()
+
+        text_system = text_system.split('\n')
+
+        text_system_update = []  # update punctual
+
+        for t in text_system:
+            if t[-1] != '.':
+                text_system_update.append(t + '.')
+            else:
+                text_system_update.append(t)
+
+        text_system_update = ' '.join(text_system_update)
+
+        sentence_token = nltk.data.load('tokenizers/punkt/english.pickle')
+        tmp = sentence_token.tokenize(text_system_update)
+
+        sentences = []
+        for item in tmp:
+            if "…" in item:
+                b = item.split("…")
+                for i in b:
+                    sentences.append(i)
+            elif '...' in item:
+                b = item.split('...')
+                if b[1][0].isupper():  # if second part has uppercase starting
+                    for i in b:
+                        sentences.append(i)
+                else:
+                    sentences.append(item)
+
+            else:
+                sentences.append(item)
+        preprocess_sents, original_sents = text_process_vietnamese(sentences)
+        return preprocess_sents, original_sents
+
+    except Exception as e:
+        print(e)
+
+
+def get_all_sentences(file_system, file_reference):
+    sentences_system = []
+    sentences_origin_system = []
+    for item in file_system:
+        sent_system, sent_original_system = split_sentences(item)
+
+        sentences_system.append((item, sent_system))
+        sentences_origin_system.append(sent_original_system)
+
+    sentences_reference = []
+    for item in file_reference:
+        with open(item, 'r') as file:
+            sentences_ref, oriaaaa = text_process_vietnamese(nltk.sent_tokenize(file.read()))
+            sentences_reference.append('. '.join(sentences_ref))
+
+    return sentences_origin_system, sentences_system, sentences_reference

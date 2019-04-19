@@ -1,4 +1,3 @@
-import os
 import numpy as np
 from joblib import dump
 from sklearn.svm import SVC
@@ -7,18 +6,12 @@ from sklearn.metrics import accuracy_score
 from method.VietNamese.SVM.Utils import text_utils
 from definitions import ROOT_DIR
 
-X_train, Y_train, X_test, Y_test = text_utils.convert_features_svm(ROOT_DIR + '/home/hieupd/PycharmProjects/multi_summari_svm_vietnamese/svm_features')
+X_train, Y_train, X_test, Y_test = text_utils.convert_features_svm(ROOT_DIR + '/method/VietNamese/SVM/Data/svm_features')
 
-# X_train = sparse.load_npz("data/datatrainsvm1.npz")
-# Y_train = text_utils.read_file_text("data/datatrainsvm_label1").split("\n")
-# X_test = sparse.load_npz("data/datatestsvm1.npz").toarray()
-# Y_test = text_utils.read_file_text("data/datatestsvm_label1").split("\n")
-#
-#
 def train():
-    model = SVC(kernel='rbf', C=32, gamma=0.01) # probability=True
+    model = SVC(kernel='rbf', C=32, gamma=0.01, probability=True) # probability=True
     model.fit(X_train, Y_train)
-    dump(model, 'model_test')
+    dump(model, 'model')
     #Y_predict = model.predict_proba(X_test)
     Y_predict = model.predict(X_test)
     predictions = [round(value) for value in Y_predict]
@@ -40,5 +33,5 @@ def train_test():
             grid.fit(X_train, Y_train)
 
             print("The best param are %s with a score of %0.3f" % (grid.best_params_, grid.best_score_))
-
-train()
+if __name__ == '__main__':
+    train()

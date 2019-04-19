@@ -7,7 +7,8 @@ start_time = time.time()
 if __name__ == "__main__":
     root_directory = os.path.dirname(os.getcwd())
     rouge_dir = root_directory + '/rouge/ROUGE-1.5.5'
-    rouge_args = '-e ROUGE-1.5.5/data -n 2 -2 4 -u -c 95 -r 1000 -f A -p 0.5 -t 0 -a -x -l 100'
+
+    rouge_args = '-e ROUGE-1.5.5/data -n 2 -x -m -2 4 -l 250 -u -c 95 -r 1000 -f A -p 0.5 -t 0 -a'
     # '-e', self._rouge_data,                           # '-a',  # evaluate all systems
     # '-n', 4,  # max-ngram                             # '-x',  # do not calculate ROUGE-L
     # '-2', 4,  # max-gap-length                        # '-u',  # include unigram in skip-bigram
@@ -19,15 +20,18 @@ if __name__ == "__main__":
     # rouge = Rouge155()
 
     rouge.model_dir = root_directory + '/Data/DUC_2007/Human_Summaries'
+    # rouge.model_dir = root_directory + '/Data/DUC_2007/Human_Summaries_Test_SVM'
     rouge.model_filename_pattern = 'summary_#ID#.[A-Z].1.txt'
     # rouge.system_dir = root_directory + '/Data/DUC_2007/MMR_results'
     # rouge.system_dir = root_directory + '/Data/DUC_2007/LexRank_results'
+    # rouge.system_dir = root_directory + '/Data/DUC_2007/SVM_results'
     # rouge.system_dir = root_directory + '/Data/DUC_2007/TextRank_results'
     # rouge.system_dir = root_directory + '/Data/DUC_2007/Kmean_results'
-    # rouge.system_dir = root_directory + '/Data/DUC_2007/Kmean_results_pagerank_position'
-    rouge.system_dir = root_directory + '/Data/DUC_2007/Kmean_results_pagerank_position_MMR'
-    # rouge.system_dir = root_directory + '/Data/DUC_2007/Kmean_results_position'
+    # rouge.system_dir = root_directory + '/Data/DUC_2007/Kmean_results_pagerank'
+    # rouge.system_dir = root_directory + '/Data/DUC_2007/Kmean_results_pagerank_position_MMR'
+    rouge.system_dir = root_directory + '/Data/DUC_2007/Kmean_results_position'
     rouge.system_filename_pattern = 'D07(\d+)[A-Z].(\w+)'
+    # rouge.system_filename_pattern = 'D07(\d+)[A-Z]'
 
     print("-----------------MMR DUC 2007--------------------------")
 

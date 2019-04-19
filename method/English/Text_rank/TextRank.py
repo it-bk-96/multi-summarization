@@ -12,7 +12,7 @@ class TextRank(object):
     def __init__(self):
         self.text = Preprocessing()
 
-    def PageRank(self, graph, node_weights, d=.85, iter=20):
+    def PageRank(self, graph, node_weights, d=.5, iter=20):
         weight_sum = numpy.sum(graph, axis=0)
         while iter > 0:
             for i in range(len(node_weights)):
@@ -127,7 +127,7 @@ class Preprocessing(object):
                                                     and x != "''" and x != "'s", stemmed_sentence))
 
                 if (len(stemmed_sentence) <= 4):
-                    break
+                    continue
 
                 if stemmed_sentence:
                     sentences.append(sentence(stemmed_sentence, OG_sent))
@@ -178,36 +178,13 @@ if __name__ == '__main__':
         path = os.path.join(root_directory + "Data/DUC_2007/Documents/", '') + folder
         print("Running LexRank Summarizer for files in folder: ", folder)
         doc_summary = []
-
-        file_human_1 = human_folder_path + "summary_" + folder[3:5] + ".A.1.txt"
-        file_human_2 = human_folder_path + "summary_" + folder[3:5] + ".B.1.txt"
-        file_human_3 = human_folder_path + "summary_" + folder[3:5] + ".C.1.txt"
-        file_human_4 = human_folder_path + "summary_" + folder[3:5] + ".D.1.txt"
-        text_1 = open(file_human_1, 'r').read()
-        text_2 = open(file_human_2, 'r').read()
-        text_3 = open(file_human_3, 'r').read()
-        text_4 = open(file_human_4, 'r').read()
-        summary_length = 0
-        for el in [text_1, text_2, text_3, text_4]:
-            llll = nltk.word_tokenize(el)
-
-            # stemming words // đưa về từ gốc
-            stemmedSent = [porter.stem(word) for word in llll]
-            stemmedSent = list(filter(lambda x: x != '.' and x != '`' and x != ',' and x != '_' and x != ';'
-                                                and x != '(' and x != ')' and x.find('&') == -1
-                                                and x != '?' and x != "'" and x != '!' and x != '''"'''
-                                                and x != '``' and x != '--' and x != ':'
-                                                and x != "''" and x != "'s", stemmedSent))
-            summary_length += len(stemmedSent)
-        summary_length = summary_length / 4
-
-        summary = textRank.main(summary_length, path)
+        summary = textRank.main(250, path)
         for sentences in summary:
             text_append = re.sub("\n", "", sentences.getOGwords())
             text_append = text_append + " "
             doc_summary.append(text_append)
         results_folder = root_directory + "Data/DUC_2007/TextRank_results"
         with open(os.path.join(results_folder, (str(folder) + ".TextRank")), "w") as fileOut:
-            fileOut.write("\n".join(doc_summary))
+            fileOut.write(" ".join(doc_summary))
 
     print(system_nu, human_nu)

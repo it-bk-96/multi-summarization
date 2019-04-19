@@ -154,9 +154,9 @@ def processFile(file_name):
                                   stemmedSent))
 
         if ((i + 1) == len(lines)) and (len(stemmedSent) <= 5):
-            break
+            continue
         # list of sentence objects
-        if stemmedSent != []:
+        if stemmedSent:
             sent = sentence(file_name, stemmedSent, originalWords)
             sentences.append(sent)
 

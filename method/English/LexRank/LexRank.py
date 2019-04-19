@@ -69,13 +69,18 @@ class LexRank(object):
 		i = 0
 		while (sum_len < n):
 			i += 1
-			summary.append(sentences[i])
-			sum_len += len(sentences[i].getStemmedWords())
+			flag = True
+			for sen_sum in summary:
+				if sentences[i].getStemmedWords() == sen_sum.getStemmedWords():
+					flag = False
+			if flag:
+				summary.append(sentences[i])
+				sum_len += len(sentences[i].getStemmedWords())
 
 		global system_nu, human_nu
 		system_nu += sum_len
-		human_nu += summary_length
-
+		human_nu += n
+		print(sum_len)
 		return summary
 
 	def normalize(self, numbers):
@@ -164,7 +169,6 @@ class Preprocessing(object):
 			text_1 = re.sub("&\w+;", " ", text_1)
 
 			sent_tokenizer = nltk.data.load('tokenizers/punkt/english.pickle')
-			# segment data into a list of sentences // tách câu
 			lines = sent_tokenizer.tokenize(text_1.strip())
 			# setting the stemmer
 
@@ -176,11 +180,10 @@ class Preprocessing(object):
 			index = lines[0].find(" _ ")
 			if index != -1:
 				lines[0] = lines[0][index + 3:]
-
 			sentences = []
 
 			for sent in lines:
-				sent = sent.strip
+				sent = sent.strip()
 				OG_sent = sent[:]
 				sent = sent.lower()
 				line = nltk.word_tokenize(sent)
@@ -193,7 +196,7 @@ class Preprocessing(object):
 														 and x != "''" and x != "'s", stemmed_sentence))
 
 				if (len(stemmed_sentence) <= 4):
-					break
+					continue
 
 				if stemmed_sentence:
 					sentences.append(sentence(file_path_and_name, stemmed_sentence, OG_sent))
@@ -307,39 +310,13 @@ if __name__ == '__main__':
 
 	lexRank = LexRank()
 	doc_folders = os.listdir(root_directory + "Data/DUC_2007/Documents")
-	human_folder_path = root_directory + "Data/DUC_2007/Human_Summaries/"
 	total_summary = []
-
-
-
 	for folder in doc_folders:
 		path = os.path.join(root_directory + "Data/DUC_2007/Documents/", '') + folder
 		print("Running LexRank Summarizer for files in folder: ", folder)
 
-		file_human_1 = human_folder_path + "summary_" + folder[3:5] + ".A.1.txt"
-		file_human_2 = human_folder_path + "summary_" + folder[3:5] + ".B.1.txt"
-		file_human_3 = human_folder_path + "summary_" + folder[3:5] + ".C.1.txt"
-		file_human_4 = human_folder_path + "summary_" + folder[3:5] + ".D.1.txt"
-		text_1 = open(file_human_1, 'r').read()
-		text_2 = open(file_human_2, 'r').read()
-		text_3 = open(file_human_3, 'r').read()
-		text_4 = open(file_human_4, 'r').read()
-		summary_length = 0
-		for el in [text_1, text_2, text_3, text_4]:
-			llll = nltk.word_tokenize(el)
-
-			# stemming words // đưa về từ gốc
-			stemmedSent = [porter.stem(word) for word in llll]
-			stemmedSent = list(filter(lambda x: x != '.' and x != '`' and x != ',' and x != '_' and x != ';'
-													 and x != '(' and x != ')' and x.find('&') == -1
-													 and x != '?' and x != "'" and x != '!' and x != '''"'''
-													 and x != '``' and x != '--' and x != ':'
-													 and x != "''" and x != "'s", stemmedSent))
-			summary_length += len(stemmedSent)
-		summary_length = summary_length / 4
-
 		doc_summary = []
-		summary = lexRank.main(summary_length, path)
+		summary = lexRank.main(250, path)
 		for sentences in summary:
 			text_append = re.sub("\n", "", sentences.getOGwords())
 			text_append = text_append + " "
